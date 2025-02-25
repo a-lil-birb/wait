@@ -1,6 +1,7 @@
 from openai import OpenAI
 from pydantic import BaseModel
 from src.config.settings import config
+from src.ui.logger import StreamlitLogger
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -18,6 +19,7 @@ class NeutralityChecker:
     def get_neutral_alternatives(self, text: str) -> ListOfTerms:
         initial_list = self._request_neutral_alternatives(text)
         sanitized_list = self._guardrail_ensure_existing_terms(text,initial_list)
+        StreamlitLogger.log(f"Non-neutral language and alternatives: {sanitized_list}")
         return sanitized_list
 
     def _request_neutral_alternatives(self, text: str) -> ListOfTerms:
