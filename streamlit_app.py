@@ -1,6 +1,6 @@
 import streamlit as st
-from core import enhance_article
-from utils.wikipedia import WikipediaClient
+from src.core import enhance_article
+from src.utils.wikipedia import WikipediaClient
 #from utils.file_parser import parse_source_files
 import time
 
