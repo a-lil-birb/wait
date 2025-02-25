@@ -37,7 +37,7 @@ class NeutralityChecker:
     def _guardrail_ensure_existing_terms(self, text :str, term_list_container :ListOfTerms) -> ListOfTerms:
         idx = 0
         while idx < len(term_list_container.term_list):
-            term :TermReplacement = term_list_container[idx]
+            term :TermReplacement = term_list_container.term_list[idx]
 
             if not (term.non_neutral_term in text):
                 # remove term if it wasn't found in original text
