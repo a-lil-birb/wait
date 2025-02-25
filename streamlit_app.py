@@ -58,8 +58,8 @@ def show_processing_log():
     </style>
     """, unsafe_allow_html=True)
 
-    with st.container():
-        st.subheader("🔄 Processing Log")
+    with st.container(height=300):
+        st.subheader("Processing Log")
         log_container = st.empty()
         
         # Show log entries with wrapping
