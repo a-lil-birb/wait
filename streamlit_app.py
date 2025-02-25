@@ -40,24 +40,6 @@ with st.sidebar:
     urls = st.text_input("Source URLs (comma-separated)", "")
 
 def show_processing_log():
-    st.markdown("""
-    <style>
-    .log-container {
-        height: 500px;
-        overflow-y: auto;
-        background-color: #0E1117;
-        border-radius: 5px;
-        padding: 10px;
-        margin: 10px 0;
-    }
-    .log-entry {
-        font-family: monospace;
-        white-space: pre-wrap;
-        margin: 5px 0;
-        font-size: 0.9em;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
     st.subheader("Processing Log")
     with st.container(height=400):
@@ -66,24 +48,8 @@ def show_processing_log():
         
         # Show log entries with wrapping
         with log_container.container():
-            components.html(
-                f"""
-                <div class="log-container">
-                    {"".join([
-                        f'<div class="log-entry">{entry}</div>' 
-                        for entry in st.session_state.log[-100:]
-                    ])}
-                </div>
-                <script>
-                    // Auto-scroll to bottom
-                    window.onload = function() {{
-                        var logDiv = document.querySelector('.log-container');
-                        logDiv.scrollTop = logDiv.scrollHeight;
-                    }};
-                </script>
-                """,
-                height=400  # Match container height + padding
-            )
+            for message in st.session_state.log[-20:]:  # Show last 20 messages
+                st.code(message, language="text")
 
 # Add test messages
 if st.button("Add Test Message"):
