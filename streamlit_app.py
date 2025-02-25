@@ -5,6 +5,7 @@ from src.utils.wikipedia import WikipediaClient
 from src.ui.logger import StreamlitLogger
 #from utils.file_parser import parse_source_files
 import time
+import random
 
 # Initialize logger with Streamlit callback
 def setup_logger():
@@ -81,14 +82,12 @@ def show_processing_log():
                     }};
                 </script>
                 """,
-                height=520  # Match container height + padding
+                height=400  # Match container height + padding
             )
 
 # Add test messages
-test_idx = 0
 if st.button("Add Test Message"):
-    st.session_state.log.append(f"[{test_idx}]" + ("This is a long test message that should wrap automatically. " * 5))
-    test_idx += 1
+    st.session_state.log.append(f"[{random.randint(0,100)}]" + ("This is a long test message that should wrap automatically. " * 5))
 
 # Sample suggestions structure
 def generate_sample_suggestions():
