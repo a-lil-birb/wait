@@ -1,5 +1,5 @@
 import argparse
-from core import enhance_article
+from src.core import enhance_article
 
 def main():
     parser = argparse.ArgumentParser(description="Wikipedia Article Enhancement System")
