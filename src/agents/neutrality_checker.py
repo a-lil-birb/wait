@@ -41,7 +41,7 @@ class NeutralityChecker:
 
             if not (term.non_neutral_term in text):
                 # remove term if it wasn't found in original text
-                print(f"Term '{term.non_neutral_term}' with replacement '{term.alternative_term}' was not found in original text.")
+                StreamlitLogger.log(f"[Guardrail] Term '{term.non_neutral_term}' with replacement '{term.alternative_term}' was not found in original text.")
                 term_list_container.term_list.pop(idx)
                 
             else:
