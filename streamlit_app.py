@@ -131,12 +131,12 @@ with col1:
 
     # Real-time log display
     #st.subheader("Processing Log")
-    """
-    log_container = st.container(height=300)
-    with log_container:
-        for message in st.session_state.log[-20:]:  # Show last 20 messages
-            st.code(message, language="text")
-    """
+    
+    #log_container = st.container(height=300)
+    #with log_container:
+    #    for message in st.session_state.log[-20:]:  # Show last 20 messages
+    #        st.code(message, language="text")
+    
     show_processing_log()
     
 
