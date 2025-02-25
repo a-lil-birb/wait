@@ -49,7 +49,7 @@ def show_processing_log():
         # Show log entries with wrapping
         with log_container.container():
             for message in st.session_state.log[-20:]:  # Show last 20 messages
-                st.code(message, language="text")
+                st.code(message, language="text", wrap_lines=True)
 
 # Add test messages
 if st.button("Add Test Message"):
