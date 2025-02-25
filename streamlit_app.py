@@ -109,7 +109,7 @@ def generate_sample_suggestions():
     ]
 
 # Main interface
-col1, col2, col3 = st.columns([3, 2, 1])
+col1, col2 = st.columns([3, 2])
 
 with col1:
     st.header("Article Analysis")
@@ -182,15 +182,15 @@ if st.session_state.suggestions:
     
     for idx, suggestion in enumerate(st.session_state.suggestions):
         with st.expander(f"Suggestion #{idx+1}: {suggestion['type'].title()}", expanded=True):
-            #col1, col2 = st.columns([4, 1])
+            col1, col2 = st.columns([4, 1])
             
-            with col2:
+            with col1:
                 st.markdown(f"""
                 **{suggestion['text']}**  
                 *Location: {suggestion['location']}*
                 """)
                 
-            with col3:
+            with col2:
                 if suggestion['status'] == 'accepted':
                     st.success("✅ Accepted")
                     if st.button("Revoke", key=f"revoke_{idx}"):
