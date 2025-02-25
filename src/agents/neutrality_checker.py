@@ -17,10 +17,10 @@ class NeutralityChecker:
         pass
     
     def get_neutral_alternatives(self, text: str) -> ListOfTerms:
-        initial_list = self._request_neutral_alternatives(text)
-        sanitized_list = self._guardrail_ensure_existing_terms(text,initial_list)
-        StreamlitLogger.log(f"Non-neutral language and alternatives: {sanitized_list}")
-        return sanitized_list
+        initial_list_container = self._request_neutral_alternatives(text)
+        sanitized_list_container = self._guardrail_ensure_existing_terms(text,initial_list_container)
+        StreamlitLogger.log(f"Non-neutral language and alternatives: {sanitized_list_container.term_list}")
+        return sanitized_list_container.term_list
 
     def _request_neutral_alternatives(self, text: str) -> ListOfTerms:
         """Use GPT-4o to check for neutrality."""
@@ -34,21 +34,21 @@ class NeutralityChecker:
         )
         return response.choices[0].message.parsed
     
-    def _guardrail_ensure_existing_terms(self, text :str, term_list :ListOfTerms) -> ListOfTerms:
+    def _guardrail_ensure_existing_terms(self, text :str, term_list_container :ListOfTerms) -> ListOfTerms:
         idx = 0
-        while idx < len(term_list):
-            term :TermReplacement = term_list[idx]
+        while idx < len(term_list_container.term_list):
+            term :TermReplacement = term_list_container[idx]
 
             if not (term.non_neutral_term in text):
                 # remove term if it wasn't found in original text
                 print(f"Term '{term.non_neutral_term}' with replacement '{term.alternative_term}' was not found in original text.")
-                term_list.pop(idx)
+                term_list_container.term_list.pop(idx)
                 
             else:
                 # only increment if no erause
                 idx += 1
 
-        return term_list
+        return term_list_container
 
         
 
