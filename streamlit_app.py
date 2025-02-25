@@ -57,7 +57,7 @@ def show_processing_log():
     }
     </style>
     """, unsafe_allow_html=True)
-    
+
     st.subheader("Processing Log")
     with st.container(height=400):
         
@@ -85,8 +85,10 @@ def show_processing_log():
             )
 
 # Add test messages
+test_idx = 0
 if st.button("Add Test Message"):
-    st.session_state.log.append("This is a long test message that should wrap automatically. " * 5)
+    st.session_state.log.append(f"[{test_idx}]" + ("This is a long test message that should wrap automatically. " * 5))
+    test_idx += 1
 
 # Sample suggestions structure
 def generate_sample_suggestions():
