@@ -1,7 +1,7 @@
 import mwclient
 import requests
 from mwclient import Site
-from config.settings import config
+from src.config.settings import config
 
 class WikipediaClient:
     def __init__(self):
