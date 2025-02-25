@@ -1,6 +1,6 @@
 from openai import OpenAI
 from pydantic import BaseModel
-from config.settings import config
+from src.config.settings import config
 
 client = OpenAI(api_key=config.openai.api_key)
 

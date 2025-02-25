@@ -1,7 +1,7 @@
-from agents import ContentAnalyzer, ContentEditor, NeutralityChecker
-from utils.wikipedia import WikipediaClient
+from src.agents import ContentAnalyzer, ContentEditor, NeutralityChecker
+from src.utils.wikipedia import WikipediaClient
 #from utils.file_parser import parse_source_files
-from config.settings import config
+from src.config.settings import config
 
 def enhance_article(article_title: str, source_paths: list = None):
     # Initialize components
