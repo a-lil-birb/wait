@@ -87,7 +87,26 @@ def show_processing_log():
 if st.button("Add Test Message"):
     st.session_state.log.append("This is a long test message that should wrap automatically. " * 5)
 
-
+# Sample suggestions structure
+def generate_sample_suggestions():
+    return [
+        {
+            'id': 1,
+            'type': 'citation',
+            'text': "Add citation for neural network performance claims",
+            'location': "Section 2, paragraph 3",
+            'status': 'pending',  # 'accepted', 'rejected'
+            'patch': "\n<ref>Smith et al. 2023</ref>"
+        },
+        {
+            'id': 2,
+            'type': 'section',
+            'text': "Add 'Ethical Considerations' section",
+            'location': "After Section 4",
+            'status': 'pending',
+            'patch': "\n\n== Ethical Considerations ==\n{{content}}"
+        }
+    ]
 
 # Main interface
 col1, col2, col3 = st.columns([3, 2, 1])
@@ -128,6 +147,7 @@ with col1:
                 status.update(label="Error occurred", state="error")
             finally:
                 st.session_state.processing = False
+                st.session_state.suggestions = generate_sample_suggestions()
 
     # Real-time log display
     #st.subheader("Processing Log")
@@ -145,26 +165,7 @@ with col1:
 if 'suggestions' not in st.session_state:
     st.session_state.suggestions = []
 
-# Sample suggestions structure (replace with your actual data)
-def generate_sample_suggestions():
-    return [
-        {
-            'id': 1,
-            'type': 'citation',
-            'text': "Add citation for neural network performance claims",
-            'location': "Section 2, paragraph 3",
-            'status': 'pending',  # 'accepted', 'rejected'
-            'patch': "\n<ref>Smith et al. 2023</ref>"
-        },
-        {
-            'id': 2,
-            'type': 'section',
-            'text': "Add 'Ethical Considerations' section",
-            'location': "After Section 4",
-            'status': 'pending',
-            'patch': "\n\n== Ethical Considerations ==\n{{content}}"
-        }
-    ]
+
 
 # Function to apply accepted suggestions
 def apply_suggestions(original: str) -> str:
@@ -174,10 +175,6 @@ def apply_suggestions(original: str) -> str:
             # Simple append example - replace with proper patching logic
             modified += suggestion['patch']  
     return modified
-
-# In your analysis button callback
-if st.button("Analyze and Enhance"):
-    st.session_state.suggestions = generate_sample_suggestions()
 
 # Display suggestions with approval buttons
 if st.session_state.suggestions:
@@ -219,7 +216,7 @@ if st.session_state.suggestions:
                             height=400)
         
         if st.button("Submit Approved Changes"):
-            # Your submission logic here
+            # submission logic here
             st.success("Submitted successfully!")
 
 
