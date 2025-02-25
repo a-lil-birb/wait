@@ -1,10 +1,24 @@
 import streamlit as st
 from src.core import enhance_article
 from src.utils.wikipedia import WikipediaClient
+from src.ui.logger import StreamlitLogger
 #from utils.file_parser import parse_source_files
 import time
 
-# Initialize
+# Initialize logger with Streamlit callback
+def setup_logger():
+    def streamlit_log(message: str):
+        if 'log' not in st.session_state:
+            st.session_state.log = []
+        st.session_state.log.append(f"{time.strftime('%H:%M:%S')} - {message}")
+        if len(st.session_state.log) > 100:  # Keep last 100 messages
+            st.session_state.log.pop(0)
+    
+    StreamlitLogger.initialize(streamlit_log)
+
+setup_logger()
+
+# Initialize Wikipedia Client
 wiki = WikipediaClient()
 st.set_page_config(page_title="WAIT Editor", layout="wide")
 
@@ -13,12 +27,6 @@ if 'processing' not in st.session_state:
     st.session_state.processing = False
 if 'log' not in st.session_state:
     st.session_state.log = []
-
-def log_message(message):
-    """Add messages to the scrolling log"""
-    st.session_state.log.append(f"{time.strftime('%H:%M:%S')} - {message}")
-    if len(st.session_state.log) > 100:  # Keep last 100 messages
-        st.session_state.log.pop(0)
 
 # Sidebar for inputs
 with st.sidebar:
@@ -41,21 +49,21 @@ with col1:
         with st.status("Processing...", expanded=True) as status:
             try:
                 # Get article content
-                log_message("Fetching Wikipedia article...")
-                original_content = wiki.get_article(article_title)
+                StreamlitLogger.log("Fetching Wikipedia article...")
+                original_content = wiki.get_article_plain_text(article_title)
                 
                 # Process sources
                 source_data = []
                 if sources:
-                    log_message("Parsing uploaded files...")
+                    StreamlitLogger.log("Parsing uploaded files...")
                     #source_data += parse_source_files(sources)
                 
                 if urls:
-                    log_message("Processing URLs...")
+                    StreamlitLogger.log("Processing URLs...")
                     # Add URL processing logic here
                 
                 # Run enhancement pipeline
-                log_message("Starting enhancement process...")
+                StreamlitLogger.log("Starting enhancement process...")
                 enhanced_content = enhance_article(article_title, source_data)
                 
                 # Store results
@@ -64,7 +72,7 @@ with col1:
                 status.update(label="Processing complete!", state="complete")
                 
             except Exception as e:
-                log_message(f"Error: {str(e)}")
+                StreamlitLogger.log(f"Error: {str(e)}")
                 status.update(label="Error occurred", state="error")
             finally:
                 st.session_state.processing = False
