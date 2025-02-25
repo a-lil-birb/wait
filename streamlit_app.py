@@ -130,7 +130,7 @@ with col1:
                 st.session_state.processing = False
 
     # Real-time log display
-    st.subheader("Processing Log")
+    #st.subheader("Processing Log")
     """
     log_container = st.container(height=300)
     with log_container:
