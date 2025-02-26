@@ -44,6 +44,20 @@ class ContentParser:
             except Exception as e:
                 logger.error(f"Failed to process file: {str(e)}")
         return results
+    
+    @classmethod
+    def parse_uploaded_files(cls, uploaded_files) -> List[str]:
+        """Process Streamlit UploadedFile objects"""
+        results = []
+        for uploaded_file in uploaded_files:
+            try:
+                file_bytes = uploaded_file.getvalue()
+                content = cls._process_file(file_bytes)
+                if content:
+                    results.append(content)
+            except Exception as e:
+                logger.error(f"Failed to process {uploaded_file.name}: {str(e)}")
+        return results
 
     @classmethod
     def _process_url(cls, url: str) -> Optional[str]:
