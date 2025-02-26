@@ -2,7 +2,7 @@
 
 # Import all agents for easy access
 from .content_analyzer import ContentAnalyzer
-#from .research_agent import ResearchAgent
+from .researcher_agent import ResearcherAgent
 from .content_editor import ContentEditor
 from .neutrality_checker import NeutralityChecker
 #from .fact_checker import FactCheckerAgent
