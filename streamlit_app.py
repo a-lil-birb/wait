@@ -105,8 +105,8 @@ with col1:
 ## suggestions
 
 # Initialize session state for suggestions
-if 'suggestions_list' not in st.session_state:
-    st.session_state.suggestions_list = []
+if 'suggestion_list' not in st.session_state:
+    st.session_state.suggestion_list = []
 
 
 
@@ -134,16 +134,16 @@ if st.session_state.suggestion_list:
                 if suggestion.status == 'accepted':
                     st.success("✅ Accepted")
                     if st.button("Revoke", key=f"revoke_{idx}"):
-                        st.session_state.suggestions_list[idx].status = 'pending'
+                        st.session_state.suggestion_list[idx].status = 'pending'
                 elif suggestion.status == 'rejected':
                     st.error("❌ Rejected")
                     if st.button("Reconsider", key=f"reconsider_{idx}"):
-                        st.session_state.suggestions_list[idx].status = 'pending'
+                        st.session_state.suggestion_list[idx].status = 'pending'
                 else:
                     if st.button("Accept", key=f"accept_{idx}"):
-                        st.session_state.suggestions_list[idx].status = 'accepted'
+                        st.session_state.suggestion_list[idx].status = 'accepted'
                     if st.button("Reject", key=f"reject_{idx}"):
-                        st.session_state.suggestions_list[idx].status = 'rejected'
+                        st.session_state.suggestion_list[idx].status = 'rejected'
 
     # Display final output based on accepted suggestions
     st.divider()
