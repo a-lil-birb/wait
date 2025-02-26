@@ -152,4 +152,4 @@ class ContentParser:
         # Remove non-printable characters
         text = re.sub(r'[^\x00-\x7F]+', ' ', text)
         # Truncate to reasonable length for LLM context
-        return text.strip()[:15000]  # Limit to ~15k characters
+        return text.strip() #[:15000]  # Limit to ~15k characters
