@@ -1,10 +1,24 @@
-from src.agents import ContentAnalyzer, ContentEditor, NeutralityChecker
+from src.agents import ContentAnalyzer, ContentEditor, ResearcherAgent, NeutralityChecker
 from src.utils.wikipedia import WikipediaClient
 from src.utils.file_parser import ContentParser
 from src.config.settings import config
 from src.ui.suggestion import Suggestion
 from src.ui.logger import StreamlitLogger
 import io
+
+def _research_text(article_title: str, parsed_source_list: list[str], source_source: str) -> tuple[list[ResearcherAgent],list[str]]:
+    researcher_upload_list : list[ResearcherAgent] = []
+    researcher_upload_output_list :list[str] = []
+    
+    for idx, parsed_source in enumerate(parsed_source_list, start=1):
+        new_researcher = ResearcherAgent(article_title, parsed_source)
+        StreamlitLogger.log(f"Researching {source_source} source {idx}...")
+        researcher_output = new_researcher.summarize_source()
+
+        researcher_upload_list.append(new_researcher)
+        researcher_upload_output_list.append(researcher_output)
+        StreamlitLogger.log(f"[ResearcherAgent#{idx}-{source_source}] Response:\n{researcher_output}")
+    return researcher_upload_list,researcher_upload_output_list
 
 def enhance_article(article_title: str, source_files: list[io.BytesIO], source_urls: str) -> list[Suggestion]:
     # Initialize components
@@ -19,9 +33,15 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
         StreamlitLogger.log(f"Parsing URLs ({len(source_urls)})...")
         parsed_source_urls :list[str] = ContentParser.parse_source_urls(source_urls)
 
-
-    StreamlitLogger.log(parsed_source_files)
-    StreamlitLogger.log(parsed_source_urls)
+    # Research the provided sources
+    researcher_upload_list : list[ResearcherAgent] = []
+    researcher_upload_output_list :list[str] = []
+    researcher_upload_list, researcher_upload_output_list = _research_text(article_title, parsed_source_files, "uploaded")
+    
+    researcher_url_list : list[ResearcherAgent] = []
+    researcher_url_output_list :list[str] = []
+    researcher_url_list, researcher_url_output_list = _research_text(article_title, parsed_source_urls, "URL")
+    #StreamlitLogger.log(parsed_source_urls)
 
     analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
