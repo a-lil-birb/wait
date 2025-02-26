@@ -72,7 +72,7 @@ with col1:
                 original_wikitext_content = wiki.get_article_page_source(article_title)
                 
                 # Process sources
-                source_file_data = []
+                #source_file_data = []
                 source_url_data = []
                 if sources:
                     #StreamlitLogger.log("Parsing uploaded files...")
@@ -89,7 +89,7 @@ with col1:
                 
                 # Run enhancement pipeline
                 StreamlitLogger.log("Starting improvement process...")
-                enhancement_suggestions :list[Suggestion] = enhance_article(article_title, source_file_data, source_url_data)
+                enhancement_suggestions :list[Suggestion] = enhance_article(article_title, sources, source_url_data)
                 
                 # Store results
                 st.session_state.original = original_content
