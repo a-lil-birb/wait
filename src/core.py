@@ -2,8 +2,9 @@ from src.agents import ContentAnalyzer, ContentEditor, NeutralityChecker
 from src.utils.wikipedia import WikipediaClient
 #from utils.file_parser import parse_source_files
 from src.config.settings import config
+from src.ui.suggestion import Suggestion
 
-def enhance_article(article_title: str, source_paths: list = None):
+def enhance_article(article_title: str, source_paths: list = None) -> list[Suggestion]:
     # Initialize components
     wiki = WikipediaClient()
     analyzer = ContentAnalyzer()
@@ -12,12 +13,15 @@ def enhance_article(article_title: str, source_paths: list = None):
     neutrality = NeutralityChecker()
     #fact_checker = FactChecker()
     
+    suggestion_list :list[Suggestion] = []
+
+
     # Fetch article content
     print(f"Analyzing article: {article_title}")
     original_content = wiki.get_article_plain_text(article_title)
 
     neutral_analysis = neutrality.get_neutral_alternatives(original_content)
-    print(neutral_analysis)
+    suggestion_list += neutrality.get_suggestions()
     # Analyze content
     analysis = analyzer.analyze(original_content)
     
@@ -26,6 +30,9 @@ def enhance_article(article_title: str, source_paths: list = None):
     if source_paths:
         print(f"Processing {len(source_paths)} sources...")
         #supplemental_data = parse_source_files(source_paths)
+
+
+    return suggestion_list
     """
     # Research phase
     research_data = researcher.gather_information(

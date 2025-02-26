@@ -2,6 +2,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 from src.config.settings import config
 from src.ui.logger import StreamlitLogger
+from src.ui.suggestion import Suggestion
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -14,13 +15,41 @@ class ListOfTerms(BaseModel):
 
 class NeutralityChecker:
     def __init__(self):
-        pass
+        self.cached_term_list = None
     
     def get_neutral_alternatives(self, text: str) -> ListOfTerms:
+        if not (self.cached_term_list is None):
+            return self.cached_term_list
+
         initial_list_container = self._request_neutral_alternatives(text)
         sanitized_list_container = self._guardrail_ensure_existing_terms(text,initial_list_container)
         StreamlitLogger.log(f"Non-neutral language and alternatives: {sanitized_list_container.term_list}")
+        
+        self.cached_term_list = sanitized_list_container.term_list
+
         return sanitized_list_container.term_list
+
+    def get_suggestions(self) -> list[Suggestion]:
+        
+        if not (self.cached_term_list is None):
+            return []
+        
+        suggestion_list = []
+        for term in self.cached_term_list:
+            term: TermReplacement
+
+            def void_func():
+                return
+            
+            new_suggestion = Suggestion(
+                type="Non-neutral language",
+                text=f"Replace '{term.non_neutral_term}' with '{term.alternative_term}'",
+                patch=void_func,
+                context="ctx",
+            )
+            suggestion_list.append(new_suggestion)
+
+        return suggestion_list
 
     def _request_neutral_alternatives(self, text: str) -> ListOfTerms:
         """Use GPT-4o to check for neutrality."""

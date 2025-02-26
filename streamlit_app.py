@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 from src.core import enhance_article
 from src.utils.wikipedia import WikipediaClient
 from src.ui.logger import StreamlitLogger
+from src.ui.suggestion import Suggestion
 #from utils.file_parser import parse_source_files
 import time
 import random
@@ -55,27 +56,6 @@ def show_processing_log():
 if st.button("Add Test Message"):
     st.session_state.log.append(f"[{random.randint(0,100)}]" + ("This is a long test message that should wrap automatically. " * 5))
 
-# Sample suggestions structure
-def generate_sample_suggestions():
-    return [
-        {
-            'id': 1,
-            'type': 'citation',
-            'text': "Add citation for neural network performance claims",
-            'location': "Section 2, paragraph 3",
-            'status': 'pending',  # 'accepted', 'rejected'
-            'patch': "\n<ref>Smith et al. 2023</ref>"
-        },
-        {
-            'id': 2,
-            'type': 'section',
-            'text': "Add 'Ethical Considerations' section",
-            'location': "After Section 4",
-            'status': 'pending',
-            'patch': "\n\n== Ethical Considerations ==\n{{content}}"
-        }
-    ]
-
 # Main interface
 col1, col2 = st.columns([3, 2])
 
@@ -90,6 +70,7 @@ with col1:
                 # Get article content
                 StreamlitLogger.log("Fetching Wikipedia article...")
                 original_content = wiki.get_article_plain_text(article_title)
+                original_wikitext_content = wiki.get_article_page_source(article_title)
                 
                 # Process sources
                 source_data = []
@@ -103,11 +84,13 @@ with col1:
                 
                 # Run enhancement pipeline
                 StreamlitLogger.log("Starting enhancement process...")
-                enhanced_content = enhance_article(article_title, source_data)
+                enhancement_suggetions :list[Suggestion] = enhance_article(article_title, source_data)
                 
                 # Store results
                 st.session_state.original = original_content
-                st.session_state.enhanced = enhanced_content
+                st.session_state.original_source = original_wikitext_content
+                #st.session_state.enhanced = enhanced_content
+                st.session_state.suggestion_list = enhancement_suggetions
                 status.update(label="Processing complete!", state="complete")
                 
             except Exception as e:
@@ -115,15 +98,7 @@ with col1:
                 status.update(label="Error occurred", state="error")
             finally:
                 st.session_state.processing = False
-                st.session_state.suggestions = generate_sample_suggestions()
-
-    # Real-time log display
-    #st.subheader("Processing Log")
-    
-    #log_container = st.container(height=300)
-    #with log_container:
-    #    for message in st.session_state.log[-20:]:  # Show last 20 messages
-    #        st.code(message, language="text")
+                #st.session_state.suggestions = generate_sample_suggestions()
     
     show_processing_log()
 
@@ -145,40 +120,45 @@ def apply_suggestions(original: str) -> str:
     return modified
 
 # Display suggestions with approval buttons
-if st.session_state.suggestions:
+if st.session_state.suggestion_list:
     st.header("Improvement Suggestions")
     
-    for idx, suggestion in enumerate(st.session_state.suggestions):
-        with st.expander(f"Suggestion #{idx+1}: {suggestion['type'].title()}", expanded=True):
+    for idx, suggestion in enumerate(st.session_state.suggestion_list):
+        suggestion :Suggestion
+        with st.expander(f"Suggestion #{idx+1}: {suggestion.type}", expanded=True):
             col1, col2 = st.columns([4, 1])
             
             with col1:
                 st.markdown(f"""
-                **{suggestion['text']}**  
-                *Location: {suggestion['location']}*
+                **{suggestion.text}**  
+                *Location: {suggestion.context}*
                 """)
                 
             with col2:
-                if suggestion['status'] == 'accepted':
+                if suggestion.status == 'accepted':
                     st.success("✅ Accepted")
                     if st.button("Revoke", key=f"revoke_{idx}"):
-                        st.session_state.suggestions[idx]['status'] = 'pending'
-                elif suggestion['status'] == 'rejected':
+                        st.session_state.suggestions_list[idx].status = 'pending'
+                elif suggestion.status == 'rejected':
                     st.error("❌ Rejected")
                     if st.button("Reconsider", key=f"reconsider_{idx}"):
-                        st.session_state.suggestions[idx]['status'] = 'pending'
+                        st.session_state.suggestions_list[idx].status = 'pending'
                 else:
                     if st.button("Accept", key=f"accept_{idx}"):
-                        st.session_state.suggestions[idx]['status'] = 'accepted'
+                        st.session_state.suggestions_list[idx].status = 'accepted'
                     if st.button("Reject", key=f"reject_{idx}"):
-                        st.session_state.suggestions[idx]['status'] = 'rejected'
+                        st.session_state.suggestions_list[idx].status = 'rejected'
 
     # Display final output based on accepted suggestions
     st.divider()
     st.header("Final Output")
     
-    if 'original' in st.session_state:
-        final_output = apply_suggestions(st.session_state.original)
+    if 'original_source' in st.session_state:
+        # Diff view
+        st.subheader("Change Preview")
+        tab1, tab2, tab3 = st.tabs(["Original", "Enhanced", "Diff"])
+
+        final_output = apply_suggestions(st.session_state.original_source)
         edited = st.text_area("Wikipedia-formatted Content", 
                             value=final_output,
                             height=400)
