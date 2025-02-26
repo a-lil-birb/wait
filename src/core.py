@@ -34,12 +34,6 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     suggestion_list += neutrality.get_suggestions(original_content)
     # Analyze content
     analysis = analyzer.analyze(original_content)
-    
-    # Process supplemental sources
-    supplemental_data = []
-    if source_paths:
-        print(f"Processing {len(source_paths)} sources...")
-        #supplemental_data = parse_source_files(source_paths)
 
 
     return suggestion_list

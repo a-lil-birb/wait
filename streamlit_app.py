@@ -73,18 +73,24 @@ with col1:
                 original_wikitext_content = wiki.get_article_page_source(article_title)
                 
                 # Process sources
-                source_data = []
+                source_file_data = []
+                source_url_data = []
                 if sources:
-                    StreamlitLogger.log("Parsing uploaded files...")
+                    #StreamlitLogger.log("Parsing uploaded files...")
                     #source_data += parse_source_files(sources)
+                    pass
                 
                 if urls:
-                    StreamlitLogger.log("Processing URLs...")
-                    # Add URL processing logic here
+                    #StreamlitLogger.log("Processing URLs...")
+                    # Add URL processing logic 
+                    split_urls = urls.split(",")
+                    for url in split_urls:
+                        url.strip()
+                    source_url_data = split_urls
                 
                 # Run enhancement pipeline
-                StreamlitLogger.log("Starting enhancement process...")
-                enhancement_suggetions :list[Suggestion] = enhance_article(article_title, source_data)
+                StreamlitLogger.log("Starting improvement process...")
+                enhancement_suggetions :list[Suggestion] = enhance_article(article_title, source_file_data, source_url_data)
                 
                 # Store results
                 st.session_state.original = original_content
