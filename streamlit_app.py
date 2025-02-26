@@ -4,7 +4,6 @@ from src.core import enhance_article
 from src.utils.wikipedia import WikipediaClient
 from src.ui.logger import StreamlitLogger
 from src.ui.suggestion import Suggestion
-#from utils.file_parser import parse_source_files
 import time
 import random
 
