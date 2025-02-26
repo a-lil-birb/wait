@@ -41,7 +41,6 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     researcher_url_list : list[ResearcherAgent] = []
     researcher_url_output_list :list[str] = []
     researcher_url_list, researcher_url_output_list = _research_text(article_title, parsed_source_urls, "URL")
-    #StreamlitLogger.log(parsed_source_urls)
 
     analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
