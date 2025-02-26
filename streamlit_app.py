@@ -89,12 +89,14 @@ with col1:
                 
                 # Run enhancement pipeline
                 StreamlitLogger.log("Starting improvement process...")
-                enhancement_suggetions :list[Suggestion] = enhance_article(article_title, source_file_data, source_url_data)
+                enhancement_suggestions :list[Suggestion] = enhance_article(article_title, source_file_data, source_url_data)
                 
                 # Store results
                 st.session_state.original = original_content
                 st.session_state.original_source = original_wikitext_content
                 #st.session_state.enhanced = enhanced_content
+
+                st.session_state.suggestion_list = enhancement_suggestions
                 
                 status.update(label="Processing complete!", state="complete")
                 
@@ -103,7 +105,7 @@ with col1:
                 status.update(label="Error occurred", state="error")
             finally:
                 st.session_state.processing = False
-                st.session_state.suggestion_list = enhancement_suggetions
+                
                 #StreamlitLogger.log(enhancement_suggetions)
     
     show_processing_log()
