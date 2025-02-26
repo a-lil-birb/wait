@@ -105,19 +105,15 @@ with col1:
 ## suggestions
 
 # Initialize session state for suggestions
-if 'suggestions' not in st.session_state:
-    st.session_state.suggestions = []
+if 'suggestions_list' not in st.session_state:
+    st.session_state.suggestions_list = []
 
 
 
 # Function to apply accepted suggestions
 def apply_suggestions(original: str) -> str:
-    modified = original
-    for suggestion in st.session_state.suggestions:
-        if suggestion['status'] == 'accepted':
-            # Simple append example - replace with proper patching logic
-            modified += suggestion['patch']  
-    return modified
+    pass
+    return original
 
 # Display suggestions with approval buttons
 if st.session_state.suggestion_list:
