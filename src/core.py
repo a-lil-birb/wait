@@ -1,12 +1,22 @@
 from src.agents import ContentAnalyzer, ContentEditor, NeutralityChecker
 from src.utils.wikipedia import WikipediaClient
-#from utils.file_parser import parse_source_files
+from utils.file_parser import ContentParser
 from src.config.settings import config
 from src.ui.suggestion import Suggestion
+from src.ui.logger import StreamlitLogger
+import io
 
-def enhance_article(article_title: str, source_paths: list = None) -> list[Suggestion]:
+def enhance_article(article_title: str, source_files: list[io.BytesIO], source_urls: str) -> list[Suggestion]:
     # Initialize components
     wiki = WikipediaClient()
+
+    if len(source_files > 0):
+        StreamlitLogger.log(f"Parsing uploaded files ({len(source_files)})...")
+        parsed_source_files :list[str] = ContentParser.parse_uploaded_files(source_files)
+    if len(source_urls > 0):
+        StreamlitLogger.log(f"Parsing URLs ({len(source_urls)})...")
+        parsed_source_urls :list[str] = ContentParser.parse_source_urls(source_urls)
+
     analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
     editor = ContentEditor()
