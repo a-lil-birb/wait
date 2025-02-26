@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="waes",
+    name="wait",
     version="0.1",
     packages=find_packages(),
     install_requires=[
         "openai>=1.0.0",
         "mwclient>=0.11.0",
+        "Markdown==3.7"
         "python-dotenv>=1.0.0",
         "python-magic>=0.4.27",
         "pdfminer.six>=20221105",
@@ -16,7 +17,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'waes = cli:main',
+            'wait = cli:main',
         ],
     },
 )
