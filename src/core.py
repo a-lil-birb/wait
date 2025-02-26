@@ -10,6 +10,8 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     # Initialize components
     wiki = WikipediaClient()
 
+    parsed_source_files = []
+    parsed_source_urls = []
     if len(source_files > 0):
         StreamlitLogger.log(f"Parsing uploaded files ({len(source_files)})...")
         parsed_source_files :list[str] = ContentParser.parse_uploaded_files(source_files)
@@ -17,6 +19,10 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
         StreamlitLogger.log(f"Parsing URLs ({len(source_urls)})...")
         parsed_source_urls :list[str] = ContentParser.parse_source_urls(source_urls)
 
+
+    StreamlitLogger.log(parsed_source_files)
+    StreamlitLogger.log(parsed_source_urls)
+    
     analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
     editor = ContentEditor()
