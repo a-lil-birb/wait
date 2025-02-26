@@ -99,7 +99,7 @@ with col1:
             finally:
                 st.session_state.processing = False
                 st.session_state.suggestion_list = enhancement_suggetions
-                StreamlitLogger.log(enhancement_suggetions)
+                #StreamlitLogger.log(enhancement_suggetions)
     
     show_processing_log()
 
