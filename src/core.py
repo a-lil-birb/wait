@@ -1,6 +1,6 @@
 from src.agents import ContentAnalyzer, ContentEditor, NeutralityChecker
 from src.utils.wikipedia import WikipediaClient
-from utils.file_parser import ContentParser
+from src.utils.file_parser import ContentParser
 from src.config.settings import config
 from src.ui.suggestion import Suggestion
 from src.ui.logger import StreamlitLogger
@@ -22,7 +22,7 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
 
     StreamlitLogger.log(parsed_source_files)
     StreamlitLogger.log(parsed_source_urls)
-    
+
     analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
     editor = ContentEditor()
