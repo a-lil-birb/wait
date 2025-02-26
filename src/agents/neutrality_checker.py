@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.config.settings import config
 from src.ui.logger import StreamlitLogger
 from src.ui.suggestion import Suggestion
+from src.utils.helpers import extract_context_from_words
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -29,7 +30,7 @@ class NeutralityChecker:
 
         return sanitized_list_container.term_list
 
-    def get_suggestions(self) -> list[Suggestion]:
+    def get_suggestions(self, text: str) -> list[Suggestion]:
         
         if self.cached_term_list is None:
             StreamlitLogger.log("empty suggestion cache")
@@ -46,7 +47,7 @@ class NeutralityChecker:
                 type="Non-neutral language",
                 text=f"Replace '{term.non_neutral_term}' with '{term.alternative_term}'",
                 patch=void_func,
-                context="ctx",
+                context=f"{extract_context_from_words(text,term.non_neutral_term)}",
             )
             suggestion_list.append(new_suggestion)
 
