@@ -31,7 +31,7 @@ class NeutralityChecker:
 
     def get_suggestions(self) -> list[Suggestion]:
         
-        if not (self.cached_term_list is None):
+        if self.cached_term_list is None:
             StreamlitLogger.log("empty suggestion cache")
             return []
         
@@ -49,8 +49,6 @@ class NeutralityChecker:
                 context="ctx",
             )
             suggestion_list.append(new_suggestion)
-        
-        StreamlitLogger.log(suggestion_list)
 
         return suggestion_list
 
