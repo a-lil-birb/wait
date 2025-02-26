@@ -3,6 +3,7 @@ openai>=1.0.0
 spacy==3.8.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 python-dotenv==1.0.0
+python-magic>=0.4.27
 requests==2.31.0
 Markdown==3.7
 beautifulsoup4==4.12.2
