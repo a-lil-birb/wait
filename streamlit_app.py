@@ -90,7 +90,7 @@ with col1:
                 st.session_state.original = original_content
                 st.session_state.original_source = original_wikitext_content
                 #st.session_state.enhanced = enhanced_content
-                st.session_state.suggestion_list = enhancement_suggetions
+                
                 status.update(label="Processing complete!", state="complete")
                 
             except Exception as e:
@@ -98,7 +98,8 @@ with col1:
                 status.update(label="Error occurred", state="error")
             finally:
                 st.session_state.processing = False
-                #st.session_state.suggestions = generate_sample_suggestions()
+                st.session_state.suggestion_list = enhancement_suggetions
+                StreamlitLogger.log(enhancement_suggetions)
     
     show_processing_log()
 
