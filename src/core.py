@@ -21,7 +21,7 @@ def enhance_article(article_title: str, source_paths: list = None) -> list[Sugge
     original_content = wiki.get_article_plain_text(article_title)
 
     neutral_analysis = neutrality.get_neutral_alternatives(original_content)
-    suggestion_list += neutrality.get_suggestions()
+    suggestion_list += neutrality.get_suggestions(original_content)
     # Analyze content
     analysis = analyzer.analyze(original_content)
     
