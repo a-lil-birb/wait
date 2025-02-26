@@ -75,13 +75,9 @@ with col1:
                 #source_file_data = []
                 source_url_data = []
                 if sources:
-                    #StreamlitLogger.log("Parsing uploaded files...")
-                    #source_data += parse_source_files(sources)
                     pass
                 
                 if urls:
-                    #StreamlitLogger.log("Processing URLs...")
-                    # Add URL processing logic 
                     split_urls = urls.split(",")
                     for url in split_urls:
                         url.strip()
