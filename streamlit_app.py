@@ -128,7 +128,7 @@ if st.session_state.suggestion_list:
             with col1:
                 st.markdown(f"""
                 **{suggestion.text}**  
-                *Location: {suggestion.context}*
+                *Context: {suggestion.context}*
                 """)
                 
             with col2:
