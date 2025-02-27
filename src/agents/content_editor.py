@@ -9,7 +9,7 @@ from src.utils.helpers import extract_context_from_words
 import difflib
 
 # Surrounding context length
-LEN_CTX = 50
+LEN_CTX = 60
 
 client = OpenAI(api_key=config.openai.api_key)
 
