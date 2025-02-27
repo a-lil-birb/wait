@@ -68,9 +68,12 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     # Analyze content
     analysis = analyzer.analyze(original_content)
 
+    StreamlitLogger.log(f"{len(researcher_upload_output_list+researcher_url_output_list)}")
     for idx, research in enumerate(researcher_upload_output_list+researcher_url_output_list, start=1):
         analysis = _analyze_research_and_article(article_title, original_content, research)
+        StreamlitLogger.log(f"[Analyzer#{idx}] Response:\n{analysis}")
         edit_suggestions = _edit_article(article_title, original_content, analysis, idx)
+        StreamlitLogger.log(f"[ContentEditor#{idx}] Edit Diff List:\n{edit_suggestions}")
         
         suggestion_list += edit_suggestions
     
