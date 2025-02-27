@@ -28,7 +28,7 @@ class Edit(BaseModel):
     modified_content: Optional[str] = None  # For modified changes
 
 def generate_diff_context(text, i1, i2):
-    return f"...{text[max(i1-LEN_CTX,0):i1]}**{text[i1:i2]}**{text[min(i2+LEN_CTX,len(text))]}..."
+    return f"...{text[max(i1-LEN_CTX,0):i1]}**{text[i1:i2]}**{text[i2:min(i2+LEN_CTX,len(text))]}..."
 
 class ContentEditor:
     def __init__(self, topic: str, article_text, summary_missing, idx):
@@ -60,19 +60,30 @@ class ContentEditor:
 
         def process_tag(tag, i1, i2, j1, j2):
             if tag == 'replace':
-                if matcher.a[i1:i2].isspace() and matcher.b[j1:j2].isspace():
+                if (not matcher.a[i1:i2].strip()) and (not matcher.b[j1:j2].strip()):
                     return
-                new_suggestion = Suggestion(
-                    type=f"Edit (ContentEditor, with source {self.index})",
-                    text=f"Replace '{matcher.a[i1:i2]}' with '{matcher.b[j1:j2]}'",
-                    patch=void_func,
-                    context=generate_diff_context(matcher.a,i1,i2),
-                )
-                suggestion_list.append(new_suggestion)
-                #return '~~`' + matcher.a[i1:i2] + '`~~**`' + matcher.b[j1:j2] + '`**'
-                return
+                
+                # pseudo-insert
+                if (not matcher.a[i1:i2].strip()):
+                    tag = 'insert'
+
+                # pseudo-delete
+                elif (not matcher.b[j1:j2].strip()):
+                    tag = 'delete'
+
+
+                else:
+                    new_suggestion = Suggestion(
+                        type=f"Edit (ContentEditor, with source {self.index})",
+                        text=f"Replace '{matcher.a[i1:i2]}' with '{matcher.b[j1:j2]}'",
+                        patch=void_func,
+                        context=generate_diff_context(matcher.a,i1,i2),
+                    )
+                    suggestion_list.append(new_suggestion)
+                    #return '~~`' + matcher.a[i1:i2] + '`~~**`' + matcher.b[j1:j2] + '`**'
+                    return
             if tag == 'delete':
-                if matcher.a[i1:i2].isspace():
+                if not matcher.a[i1:i2].strip():
                     return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
@@ -87,7 +98,7 @@ class ContentEditor:
                 return
                 #return matcher.a[i1:i2]
             if tag == 'insert':
-                if matcher.b[j1:j2].isspace():
+                if not matcher.a[i1:i2].strip():
                     return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
