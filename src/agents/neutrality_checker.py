@@ -45,7 +45,7 @@ class NeutralityChecker:
             
             new_suggestion = Suggestion(
                 type="Non-neutral language",
-                text=f"Replace '{term.non_neutral_term}' with '{term.alternative_term}'",
+                text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=void_func,
                 context=f"{extract_context_from_words(text,term.non_neutral_term)}",
             )

@@ -127,7 +127,7 @@ class ContentEditor:
                     return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
-                    text=f"Delete '{matcher.a[i1:i2]}'",
+                    text=f"Delete <b>'{matcher.a[i1:i2]}'</b>",
                     patch=void_func,
                     context=generate_diff_context(matcher.a,i1,i2),
                 )
@@ -142,7 +142,7 @@ class ContentEditor:
                     return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
-                    text=f"Insert '{matcher.a[i1:i2]}'",
+                    text=f"Insert <b>'{matcher.a[i1:i2]}'</b>",
                     patch=void_func,
                     context=generate_diff_context(matcher.b,j1,j2),
                 )
