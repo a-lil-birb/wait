@@ -7,6 +7,27 @@ from src.ui.suggestion import Suggestion
 import time
 import random
 
+# Initialize logger with Streamlit callback
+def setup_logger():
+    def streamlit_log(message: str):
+        if 'log' not in st.session_state:
+            st.session_state.log = []
+
+        timestamp = time.strftime("%H:%M:%S")
+        entry = f"{timestamp} - {message}"
+
+        st.session_state.log.append(entry)
+
+        # Immediately update UI
+        if 'log_container' in st.session_state:
+            with st.session_state.log_container:
+                st.code(entry)
+    
+    StreamlitLogger.initialize(streamlit_log)
+
+setup_logger()
+
+
 # Initialize Wikipedia Client
 wiki = WikipediaClient()
 st.set_page_config(page_title="WAIT Editor", layout="wide")
@@ -38,20 +59,6 @@ def show_processing_log():
             for message in st.session_state.log: #[-20:]:  # Show last 20 messages
                 st.code(message, language="text", wrap_lines=True)
 
-# Initialize logger with Streamlit callback
-def setup_logger():
-    def streamlit_log(message: str):
-        if 'log' not in st.session_state:
-            st.session_state.log = []
-        st.session_state.log.append(f"{time.strftime('%H:%M:%S')} - {message}")
-        if len(st.session_state.log) > 100:  # Keep last 100 messages
-            st.session_state.log.pop(0)
-        show_processing_log()
-    
-    StreamlitLogger.initialize(streamlit_log)
-
-setup_logger()
-
 # Main interface
 col1, col2 = st.columns([3, 2])
 
@@ -62,6 +69,8 @@ with col1:
         st.session_state.processing = True
         
         with st.status("Processing...", expanded=True) as status:
+            # Initialize real-time log container
+            st.session_state.log_container = st.empty()
             try:
                 # Get article content
                 StreamlitLogger.log("Fetching Wikipedia article...")
