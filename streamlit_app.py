@@ -7,19 +7,6 @@ from src.ui.suggestion import Suggestion
 import time
 import random
 
-# Initialize logger with Streamlit callback
-def setup_logger():
-    def streamlit_log(message: str):
-        if 'log' not in st.session_state:
-            st.session_state.log = []
-        st.session_state.log.append(f"{time.strftime('%H:%M:%S')} - {message}")
-        if len(st.session_state.log) > 100:  # Keep last 100 messages
-            st.session_state.log.pop(0)
-    
-    StreamlitLogger.initialize(streamlit_log)
-
-setup_logger()
-
 # Initialize Wikipedia Client
 wiki = WikipediaClient()
 st.set_page_config(page_title="WAIT Editor", layout="wide")
@@ -51,13 +38,27 @@ def show_processing_log():
             for message in st.session_state.log: #[-20:]:  # Show last 20 messages
                 st.code(message, language="text", wrap_lines=True)
 
+# Initialize logger with Streamlit callback
+def setup_logger():
+    def streamlit_log(message: str):
+        if 'log' not in st.session_state:
+            st.session_state.log = []
+        st.session_state.log.append(f"{time.strftime('%H:%M:%S')} - {message}")
+        if len(st.session_state.log) > 100:  # Keep last 100 messages
+            st.session_state.log.pop(0)
+        show_processing_log()
+    
+    StreamlitLogger.initialize(streamlit_log)
+
+setup_logger()
+
 # Main interface
 col1, col2 = st.columns([3, 2])
 
 with col1:
     st.header("Article Analysis")
     
-    if st.button("Analyze and Enhance") and not st.session_state.processing:
+    if st.button("Analyze and Improve") and not st.session_state.processing:
         st.session_state.processing = True
         
         with st.status("Processing...", expanded=True) as status:
