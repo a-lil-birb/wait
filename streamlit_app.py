@@ -143,7 +143,8 @@ if st.session_state.suggestions:
             
             with col1:
                 st.markdown(f"""
-                **{suggestion.text}**  
+                {suggestion.text}
+                  
                 <em>Context: {suggestion.context}</em>
                 """, unsafe_allow_html=True)
                 

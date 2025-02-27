@@ -115,7 +115,7 @@ class ContentEditor:
                 else:
                     new_suggestion = Suggestion(
                         type=f"Edit (ContentEditor, with source {self.index})",
-                        text=f"Replace '{matcher.a[i1:i2]}' with '{matcher.b[j1:j2]}'",
+                        text=f"Replace <b>'{matcher.a[i1:i2]}'</b> with <b>'{matcher.b[j1:j2]}'</b>",
                         patch=void_func,
                         context=generate_diff_context(matcher.a,i1,i2),
                     )
