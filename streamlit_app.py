@@ -48,12 +48,8 @@ def show_processing_log():
         
         # Show log entries with wrapping
         with log_container.container():
-            for message in st.session_state.log[-20:]:  # Show last 20 messages
+            for message in st.session_state.log: #[-20:]:  # Show last 20 messages
                 st.code(message, language="text", wrap_lines=True)
-
-# Add test messages
-if st.button("Add Test Message"):
-    st.session_state.log.append(f"[{random.randint(0,100)}]" + ("This is a long test message that should wrap automatically. " * 5))
 
 # Main interface
 col1, col2 = st.columns([3, 2])
