@@ -143,9 +143,9 @@ if st.session_state.suggestions:
             
             with col1:
                 st.markdown(f"""
-                {suggestion.text}
-                  
-                <em>Context: {suggestion.context}</em>
+                {suggestion.text.replace("\n", " ")}
+
+                <em>Context: {suggestion.context.replace("\n", " ")}</em>
                 """, unsafe_allow_html=True)
                 
             with col2:
