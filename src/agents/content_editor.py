@@ -9,7 +9,7 @@ from src.utils.helpers import extract_context_from_words
 import difflib
 
 # Surrounding context length
-LEN_CTX = 40
+LEN_CTX = 50
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -27,6 +27,9 @@ class Edit(BaseModel):
     original_content: Optional[str] = None  # For modified changes
     modified_content: Optional[str] = None  # For modified changes
 
+def generate_diff_context(text, i1, i2):
+    return f"...{text[max(i1-LEN_CTX,0):i1]}**{text[i1:i2]}**{text[min(i2+LEN_CTX,len(text))]}..."
+
 class ContentEditor:
     def __init__(self, topic: str, article_text, summary_missing, idx):
         self.topic: str = topic
@@ -41,7 +44,7 @@ class ContentEditor:
             model="gpt-4o-mini-2024-07-18",
             messages=[
                 {"role": "system", "content": "You are a Wikipedia editor. Follow Wikipedia's neutral tone and style. You focus on adding missing information rather than rewording existing information in the article."},
-                {"role": "user", "content": f"Given a summary of missing information and an article, edit the article to include all information contained in the summary, placing the information in the relevant place. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. Here is the summary:\n{self.summary}\n\n\nSUMMARY ENDS HERE. The following is the original article to edit:\n{self.text}"}
+                {"role": "user", "content": f"Given a summary of a different source and our current article, edit the current article to include all information contained in the summary, placing the information in the relevant place. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. Here is the summary:\n{self.summary}\n\n\nSUMMARY ENDS HERE. The following is the current article to edit:\n{self.text}"}
             ]
         )
         self.response = response.choices[0].message.content
@@ -57,21 +60,25 @@ class ContentEditor:
 
         def process_tag(tag, i1, i2, j1, j2):
             if tag == 'replace':
+                if matcher.a[i1:i2].isspace() and matcher.b[j1:j2].isspace():
+                    return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
                     text=f"Replace '{matcher.a[i1:i2]}' with '{matcher.b[j1:j2]}'",
                     patch=void_func,
-                    context=f"...{matcher.a[max(i1-LEN_CTX,0):max(i2+LEN_CTX,len(self.text))]}...",
+                    context=generate_diff_context(matcher.a,i1,i2),
                 )
                 suggestion_list.append(new_suggestion)
                 #return '~~`' + matcher.a[i1:i2] + '`~~**`' + matcher.b[j1:j2] + '`**'
                 return
             if tag == 'delete':
+                if matcher.a[i1:i2].isspace():
+                    return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
                     text=f"Delete '{matcher.a[i1:i2]}'",
                     patch=void_func,
-                    context=f"...{matcher.a[max(i1-LEN_CTX,0):max(i2+LEN_CTX,len(self.text))]}...",
+                    context=generate_diff_context(matcher.a,i1,i2),
                 )
                 suggestion_list.append(new_suggestion)
                 #return '~~`' + matcher.a[i1:i2] + '`~~'
@@ -80,11 +87,13 @@ class ContentEditor:
                 return
                 #return matcher.a[i1:i2]
             if tag == 'insert':
+                if matcher.b[j1:j2].isspace():
+                    return
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
                     text=f"Insert '{matcher.a[i1:i2]}'",
                     patch=void_func,
-                    context=f"...{matcher.a[max(j1-LEN_CTX,0):max(j2+LEN_CTX,len(self.response))]}...",
+                    context=generate_diff_context(matcher.b,j1,j2),
                 )
                 suggestion_list.append(new_suggestion)
                 #return '**`' + matcher.b[j1:j2] + '`**'
