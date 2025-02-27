@@ -28,7 +28,7 @@ class Edit(BaseModel):
     modified_content: Optional[str] = None  # For modified changes
 
 def generate_diff_context(text, i1, i2):
-    return f"...{text[max(i1-LEN_CTX,0):i1]}**{text[i1:i2]}**{text[i2:min(i2+LEN_CTX,len(text))]}..."
+    return f"...{text[max(i1-LEN_CTX,0):i1]}<b>{text[i1:i2]}</b>{text[i2:min(i2+LEN_CTX,len(text))]}..."
 
 class ContentEditor:
     def __init__(self, topic: str, article_text, summary_missing, idx):
@@ -44,7 +44,7 @@ class ContentEditor:
             model="gpt-4o-mini-2024-07-18",
             messages=[
                 {"role": "system", "content": "You are a Wikipedia editor. Follow Wikipedia's neutral tone and style. You focus on adding missing information rather than rewording existing information in the article."},
-                {"role": "user", "content": f"Given a summary of a different source and our current article, edit the current article to include all information contained in the summary, placing the information in the relevant place. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. Here is the summary:\n{self.summary}\n\n\nSUMMARY ENDS HERE. The following is the current article to edit:\n{self.text}"}
+                {"role": "user", "content": f"Given a summary of a different source and our current article, edit the current article to include all information contained in the summary, placing the information in the relevant place. Write NEW sentences inside the article. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. Here is the summary:\n{self.summary}\n\n\nSUMMARY ENDS HERE. The following is the current article to edit:\n{self.text}"}
             ]
         )
         self.response = response.choices[0].message.content
