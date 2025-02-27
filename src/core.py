@@ -53,9 +53,9 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     researcher_url_output_list :list[str] = []
     researcher_url_list, researcher_url_output_list = _research_text(article_title, parsed_source_urls, "URL")
 
-    analyzer = ContentAnalyzer()
+    #analyzer = ContentAnalyzer()
     #researcher = ResearchAgent()
-    editor = ContentEditor()
+    #editor = ContentEditor()
     neutrality = NeutralityChecker()
     #fact_checker = FactChecker()
     
@@ -64,11 +64,8 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     # Fetch article content
     print(f"Analyzing article: {article_title}")
     original_content = wiki.get_article_plain_text(article_title)
-    
-    # Analyze content
-    analysis = analyzer.analyze(original_content)
 
-    StreamlitLogger.log(f"{len(researcher_upload_output_list+researcher_url_output_list)}")
+    #StreamlitLogger.log(f"{len(researcher_upload_output_list+researcher_url_output_list)}")
     for idx, research in enumerate(researcher_upload_output_list+researcher_url_output_list, start=1):
         analysis = _analyze_research_and_article(article_title, original_content, research)
         StreamlitLogger.log(f"[Analyzer#{idx}] Response:\n{analysis}")
@@ -82,30 +79,3 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
 
 
     return suggestion_list
-    """
-    # Research phase
-    research_data = researcher.gather_information(
-        article_title,
-        analysis["missing_sections"],
-        supplemental_data
-    )
-    
-    # Generate edits
-    draft_content = editor.generate_improvements(
-        original_content,
-        analysis,
-        research_data
-    )
-    
-    # Fact-check
-    verified_content = fact_checker.verify_content(draft_content)
-    
-    # Show diff and get confirmation
-    diff = wiki.show_diff(original_content, verified_content)
-    print(f"Proposed changes:\n{diff}")
-    
-    if input("Accept changes? (y/n): ").lower() == "y":
-        wiki.submit_edit(article_title, verified_content)
-        print("Edit submitted successfully!")
-    
-    """
