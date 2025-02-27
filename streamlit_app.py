@@ -174,6 +174,7 @@ if st.session_state.suggestions:
                 with btn_col3:
                     if st.button("Refine", key=f"refine_btn_{suggestion_id}"):
                         st.session_state[refine_key] = not st.session_state[refine_key]
+                        st.session_state.suggestions[idx].status = 'pending'
                         st.rerun()
 
             # Refine input area
