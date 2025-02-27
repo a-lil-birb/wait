@@ -127,8 +127,8 @@ if st.session_state.suggestion_list:
             with col1:
                 st.markdown(f"""
                 **{suggestion.text}**  
-                *Context: {suggestion.context}*
-                """)
+                <em>Context: {suggestion.context}</em>
+                """, unsafe_allow_html=True)
                 
             with col2:
                 if suggestion.status == 'accepted':
