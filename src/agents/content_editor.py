@@ -51,7 +51,37 @@ class ContentEditor:
         return response.choices[0].message.content
     
     def get_diff_suggestions(self) -> list[Suggestion]:
+        THRESHOLD = 10  # Adjust this threshold as needed
+
         matcher = difflib.SequenceMatcher(None, self.text, self.response)
+        opcodes = matcher.get_opcodes()
+        # Merge nearby opcodes
+        merged = []
+        for op in opcodes:
+            if not merged:
+                merged.append(op)
+            else:
+                last = merged[-1]
+                # Calculate gaps in both a and b
+                a_gap = op[1] - last[2]
+                b_gap = op[3] - last[4]
+                if a_gap <= THRESHOLD or b_gap <= THRESHOLD:
+                    # Merge the current op with the last one
+                    merged_a_start = last[1]
+                    merged_a_end = op[2]
+                    merged_b_start = last[3]
+                    merged_b_end = op[4]
+                    a_len = merged_a_end - merged_a_start
+                    b_len = merged_b_end - merged_b_start
+                    if a_len > 0 and b_len > 0:
+                        new_tag = 'replace'
+                    elif a_len > 0:
+                        new_tag = 'delete'
+                    else:
+                        new_tag = 'insert'
+                    merged[-1] = (new_tag, merged_a_start, merged_a_end, merged_b_start, merged_b_end)
+                else:
+                    merged.append(op)
 
         suggestion_list = []
 
@@ -111,5 +141,5 @@ class ContentEditor:
                 return
             StreamlitLogger.log(f"[ContentEditor{self.index}] Unknown tag {tag} while diff-ing.")
             return
-        [process_tag(*t) for t in matcher.get_opcodes()]
+        [process_tag(*t) for t in merged]
         return suggestion_list
