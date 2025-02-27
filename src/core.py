@@ -18,7 +18,18 @@ def _research_text(article_title: str, parsed_source_list: list[str], source_sou
         researcher_upload_list.append(new_researcher)
         researcher_upload_output_list.append(researcher_output)
         StreamlitLogger.log(f"[ResearcherAgent#{idx}-{source_source}] Response:\n{researcher_output}")
+
     return researcher_upload_list,researcher_upload_output_list
+
+def _analyze_research_and_article(article_title: str, article_content: str, summary: str):
+    new_analyzer = ContentAnalyzer(article_title, article_content, summary)
+    analysis = new_analyzer.find_missing_information()
+    return analysis
+
+def _edit_article(article_title: str, article_content: str, summary: str, idx: int) -> list[Suggestion]:
+    new_editor = ContentEditor(article_title, article_content, summary, idx)
+    new_editor.improve_article_with_missing_info()
+    return new_editor.get_diff_suggestions()
 
 def enhance_article(article_title: str, source_files: list[io.BytesIO], source_urls: str) -> list[Suggestion]:
     # Initialize components
@@ -50,15 +61,21 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
     
     suggestion_list :list[Suggestion] = []
 
-
     # Fetch article content
     print(f"Analyzing article: {article_title}")
     original_content = wiki.get_article_plain_text(article_title)
-
-    neutral_analysis = neutrality.get_neutral_alternatives(original_content)
-    suggestion_list += neutrality.get_suggestions(original_content)
+    
     # Analyze content
     analysis = analyzer.analyze(original_content)
+
+    for idx, research in enumerate(researcher_upload_output_list+researcher_url_output_list, start=1):
+        analysis = _analyze_research_and_article(article_title, original_content, research)
+        edit_suggestions = _edit_article(article_title, original_content, analysis, idx)
+        
+        suggestion_list += edit_suggestions
+    
+    neutral_analysis = neutrality.get_neutral_alternatives(original_content)
+    suggestion_list += neutrality.get_suggestions(original_content)
 
 
     return suggestion_list
