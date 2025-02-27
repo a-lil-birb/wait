@@ -1,27 +1,32 @@
-import spacy
-from typing import Dict
+from openai import OpenAI
+from pydantic import BaseModel
+from src.config.settings import config
+from src.ui.logger import StreamlitLogger
+from src.ui.suggestion import Suggestion
+
+client = OpenAI(api_key=config.openai.api_key)
 
 class ContentAnalyzer:
-    def __init__(self):
-        self.nlp = spacy.load("en_core_web_sm")
+    def __init__(self, topic: str, article_text: str, provided_summary: str):
+        self.topic: str = topic
+        self.text: str = article_text
+        self.summary: str = provided_summary
+        self.response: str = None
     
-    def analyze(self, text: str) -> Dict:
-        doc = self.nlp(text)
-        return {
-            "readability": self._calculate_readability(doc),
-            "citation_issues": self._find_citation_issues(text),
-            "missing_sections": self._identify_missing_sections(doc)
-        }
-    
-    def _calculate_readability(self, doc) -> float:
-        # Simplified readability metric
-        return len(doc) / (len(list(doc.sents)) + 1)
-    
-    def _find_citation_issues(self, text: str) -> int:
-        return text.lower().count("[citation needed]")
-    
-    def _identify_missing_sections(self, doc) -> list:
-        # Simple section analysis (expand with ML model)
-        common_sections = {"history", "background", "controversies"}
-        existing = {chunk.text.lower() for chunk in doc.noun_chunks}
-        return list(common_sections - existing)
+    def find_missing_information(self) -> str:
+        """Use GPT-4 to improve content based on analysis."""
+        response = client.chat.completions.create(
+            model="gpt-4o-mini-2024-07-18",
+            messages=[
+                {"role": "system", "content": "You are a Wikipedia editor. Follow Wikipedia's neutral tone and style, and do not make up information that is not in the presented documents."},
+                {"role": "user", "content": f"You will be given a summary of an external source of information, and an article about the same topic. In bullet form, while preserving all details, identify any information in the summary that is not present in the article. The summary is the following:\n{self.summary}\n\n\nTHE SUMMARY ENDS HERE. The article is the following:\n{self.text}"}
+            ]
+        )
+        self.response = response.choices[0].message.content
+
+        return response.choices[0].message.content
+
+
+
+        
+
