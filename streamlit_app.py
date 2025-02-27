@@ -115,7 +115,7 @@ with col1:
 ## suggestions
 
 # Initialize session state for suggestions
-if 'suggestion' not in st.session_state:
+if 'suggestions' not in st.session_state:
     st.session_state.suggestions = []
 
 
