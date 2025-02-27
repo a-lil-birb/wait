@@ -98,7 +98,7 @@ with col1:
                 st.session_state.original_source = original_wikitext_content
                 #st.session_state.enhanced = enhanced_content
 
-                st.session_state.suggestion_list = enhancement_suggestions
+                st.session_state.suggestions = enhancement_suggestions
                 
                 status.update(label="Processing complete!", state="complete")
                 
@@ -115,8 +115,8 @@ with col1:
 ## suggestions
 
 # Initialize session state for suggestions
-if 'suggestion_list' not in st.session_state:
-    st.session_state.suggestion_list = []
+if 'suggestion' not in st.session_state:
+    st.session_state.suggestions = []
 
 
 
@@ -126,12 +126,19 @@ def apply_suggestions(original: str) -> str:
     return original
 
 # Display suggestions with approval buttons
-if st.session_state.suggestion_list:
+if st.session_state.suggestions:
     st.header("Improvement Suggestions")
     
-    for idx, suggestion in enumerate(st.session_state.suggestion_list):
-        suggestion :Suggestion
-        with st.expander(f"Suggestion #{idx+1}: {suggestion.type}", expanded=True):
+    for idx, suggestion in enumerate(st.session_state.suggestions):
+        suggestion_id = suggestion['id']
+        expander_key = f"expander_{suggestion_id}"
+        refine_key = f"refine_{suggestion_id}"
+        
+        # Initialize refine state
+        if f"refine_{suggestion_id}" not in st.session_state:
+            st.session_state[f"refine_{suggestion_id}"] = False
+
+        with st.expander(f"Suggestion #{idx+1}: {suggestion['type'].title()}", expanded=True):
             col1, col2 = st.columns([4, 1])
             
             with col1:
@@ -141,19 +148,44 @@ if st.session_state.suggestion_list:
                 """, unsafe_allow_html=True)
                 
             with col2:
-                if suggestion.status == 'accepted':
-                    st.success("✅ Accepted")
-                    if st.button("Revoke", key=f"revoke_{idx}"):
-                        st.session_state.suggestion_list[idx].status = 'pending'
-                elif suggestion.status == 'rejected':
-                    st.error("❌ Rejected")
-                    if st.button("Reconsider", key=f"reconsider_{idx}"):
-                        st.session_state.suggestion_list[idx].status = 'pending'
+                status_container = st.empty()
+                
+                # Current status display
+                if suggestion['status'] == 'accepted':
+                    status_container.success("✅ Accepted")
+                elif suggestion['status'] == 'rejected':
+                    status_container.error("❌ Rejected")
                 else:
-                    if st.button("Accept", key=f"accept_{idx}"):
-                        st.session_state.suggestion_list[idx].status = 'accepted'
-                    if st.button("Reject", key=f"reject_{idx}"):
-                        st.session_state.suggestion_list[idx].status = 'rejected'
+                    status_container.info("🔄 Pending")
+
+                # Button group
+                btn_col1, btn_col2, btn_col3 = st.columns([1,1,1])
+                
+                with btn_col1:
+                    if st.button("Accept", key=f"accept_{suggestion_id}"):
+                        st.session_state.suggestions[idx]['status'] = 'accepted'
+                        st.experimental_rerun()
+                        
+                with btn_col2:
+                    if st.button("Reject", key=f"reject_{suggestion_id}"):
+                        st.session_state.suggestions[idx]['status'] = 'rejected'
+                        st.experimental_rerun()
+                        
+                with btn_col3:
+                    if st.button("Refine", key=f"refine_btn_{suggestion_id}"):
+                        st.session_state[refine_key] = not st.session_state[refine_key]
+                        st.experimental_rerun()
+
+            # Refine input area
+            if st.session_state[refine_key]:
+                refinement = st.text_area(
+                    "Enter refinement instructions:",
+                    key=f"refine_input_{suggestion_id}",
+                    placeholder="Ask for clarification or alternative approaches..."
+                )
+                if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
+                    st.session_state[refine_key] = False
+                    st.experimental_rerun()
 
     # Display final output based on accepted suggestions
     st.divider()
