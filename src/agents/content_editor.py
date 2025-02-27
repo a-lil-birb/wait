@@ -57,31 +57,41 @@ class ContentEditor:
         opcodes = matcher.get_opcodes()
         # Merge nearby opcodes
         merged = []
-        for op in opcodes:
-            if not merged:
-                merged.append(op)
-            else:
-                last = merged[-1]
-                # Calculate gaps in both a and b
-                a_gap = op[1] - last[2]
-                b_gap = op[3] - last[4]
-                if a_gap <= THRESHOLD or b_gap <= THRESHOLD:
-                    # Merge the current op with the last one
-                    merged_a_start = last[1]
-                    merged_a_end = op[2]
-                    merged_b_start = last[3]
-                    merged_b_end = op[4]
-                    a_len = merged_a_end - merged_a_start
-                    b_len = merged_b_end - merged_b_start
-                    if a_len > 0 and b_len > 0:
-                        new_tag = 'replace'
-                    elif a_len > 0:
-                        new_tag = 'delete'
-                    else:
-                        new_tag = 'insert'
-                    merged[-1] = (new_tag, merged_a_start, merged_a_end, merged_b_start, merged_b_end)
-                else:
-                    merged.append(op)
+        i = 0
+        n = len(opcodes)
+        
+        while i < n:
+            # Check if current, next, and next+1 opcodes form a change-equal-change pattern
+            if i + 2 < n:
+                op1 = opcodes[i]
+                op2 = opcodes[i+1]
+                op3 = opcodes[i+2]
+                # Ensure the middle opcode is 'equal' and the others are changes
+                if op1[0] != 'equal' and op2[0] == 'equal' and op3[0] != 'equal':
+                    a_len_equal = op2[2] - op2[1]
+                    b_len_equal = op2[4] - op2[3]
+                    # Check if the equal segment is short enough in either a or b
+                    if a_len_equal <= THRESHOLD or b_len_equal <= THRESHOLD:
+                        # Merge the three opcodes into one
+                        new_a_start = op1[1]
+                        new_a_end = op3[2]
+                        new_b_start = op1[3]
+                        new_b_end = op3[4]
+                        a_length = new_a_end - new_a_start
+                        b_length = new_b_end - new_b_start
+                        # Determine the merged tag
+                        if a_length > 0 and b_length > 0:
+                            new_tag = 'replace'
+                        elif a_length > 0:
+                            new_tag = 'delete'
+                        else:
+                            new_tag = 'insert'
+                        merged.append((new_tag, new_a_start, new_a_end, new_b_start, new_b_end))
+                        i += 3  # Skip the processed opcodes
+                        continue
+            # If no merge, add the current opcode and move forward
+            merged.append(opcodes[i])
+            i += 1
 
         suggestion_list = []
 
