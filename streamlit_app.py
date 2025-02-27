@@ -139,7 +139,7 @@ if st.session_state.suggestions:
             st.session_state[f"refine_{suggestion_id}"] = False
 
         with st.expander(f"Suggestion #{idx+1}: {suggestion.type}", expanded=True):
-            col1, col2 = st.columns([4, 1])
+            col1, col2 = st.columns([4, 2])
             
             with col1:
                 st.markdown(f"""
@@ -164,17 +164,17 @@ if st.session_state.suggestions:
                 with btn_col1:
                     if st.button("Accept", key=f"accept_{suggestion_id}"):
                         st.session_state.suggestions[idx].status = 'accepted'
-                        st.experimental_rerun()
+                        st.rerun()
                         
                 with btn_col2:
                     if st.button("Reject", key=f"reject_{suggestion_id}"):
                         st.session_state.suggestions[idx].status = 'rejected'
-                        st.experimental_rerun()
+                        st.rerun()
                         
                 with btn_col3:
                     if st.button("Refine", key=f"refine_btn_{suggestion_id}"):
                         st.session_state[refine_key] = not st.session_state[refine_key]
-                        st.experimental_rerun()
+                        st.rerun()
 
             # Refine input area
             if st.session_state[refine_key]:
@@ -185,7 +185,7 @@ if st.session_state.suggestions:
                 )
                 if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
                     st.session_state[refine_key] = False
-                    st.experimental_rerun()
+                    st.rerun()
 
     # Display final output based on accepted suggestions
     st.divider()
