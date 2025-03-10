@@ -5,6 +5,7 @@ setup(
     version="0.1",
     packages=find_packages(),
     install_requires=[
+        "anthropic==0.49.0",
         "openai>=1.0.0",
         "mwclient>=0.11.0",
         "Markdown==3.7"
