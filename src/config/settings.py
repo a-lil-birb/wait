@@ -26,6 +26,15 @@ class OpenAIConfig:
         
         if not self.api_key:
             raise ConfigValidationError("OpenAI API key is required")
+        
+class AnthropicConfig:
+    def __init__(self):
+        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        #self.model = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
+        #self.temperature = float(os.getenv("OPENAI_TEMP", "0.3"))
+        
+        if not self.api_key:
+            raise ConfigValidationError("Anthropic API key is required")
 
 class FileConfig:
     def __init__(self):
@@ -44,6 +53,7 @@ class Settings:
     def __init__(self):
         self.wiki = WikipediaConfig()
         self.openai = OpenAIConfig()
+        self.anthropic = AnthropicConfig()
         self.files = FileConfig()
         self.logging = LoggingConfig()
         self.debug = os.getenv("DEBUG", "false").lower() == "true"
