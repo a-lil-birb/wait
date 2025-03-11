@@ -10,6 +10,7 @@ import markdown
 import logging
 from pathlib import Path
 import re
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -57,6 +58,19 @@ class ContentParser:
                     results.append(content)
             except Exception as e:
                 logger.error(f"Failed to process {uploaded_file.name}: {str(e)}")
+        return results
+    
+    def encode_pdfs_into_b64(cls, uploaded_files) -> List[str]:
+        """Process Streamlit UploadedFile (preferably pdf) into a b64 string"""
+        results = []
+        for uploaded_file in uploaded_files:
+            try:
+                file_bytes = uploaded_file.getvalue()
+                b64string = base64.standard_b64encode(file_bytes).decode("utf-8")
+                if b64string:
+                    results.append(b64string)
+            except Exception as e:
+                logger.error(f"Failed to process {uploaded_file.name} into a b64 string: {str(e)}")
         return results
 
     @classmethod
