@@ -8,6 +8,7 @@ setup(
         "anthropic==0.49.0",
         "openai>=1.0.0",
         "mwclient>=0.11.0",
+        "mwparserfromhell==0.6.6",
         "Markdown==3.7"
         "python-dotenv>=1.0.0",
         "python-magic>=0.4.27",
