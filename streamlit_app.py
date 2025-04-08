@@ -274,3 +274,6 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
         if st.button("Submit Approved Changes"):
             # submission logic here
             st.success("Submitted successfully!")
+
+if __name__ == "__main__":
+    st.session_state.processing = False
