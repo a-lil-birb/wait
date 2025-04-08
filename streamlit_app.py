@@ -141,7 +141,7 @@ def process_active_flow():
     if st.session_state.active_flow:
         # Validate flow exists in registry
         if st.session_state.active_flow not in FLOW_REGISTRY:
-            StreamlitLogger.log(f"Invalid flow: {st.session_state.active_flow}")
+            #StreamlitLogger.log(f"Invalid flow: {st.session_state.active_flow}")
             st.session_state.active_flow = None
             return
 
