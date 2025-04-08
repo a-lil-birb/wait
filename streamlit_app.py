@@ -49,9 +49,7 @@ if 'flow_status' not in st.session_state:
 
 # Flow registry and handlers
 FLOW_REGISTRY: Dict[AnalysisFlow, Callable] = {
-    AnalysisFlow.SOURCE_IMPROVEMENT: None,
-    AnalysisFlow.LANGUAGE_NEUTRALITY: None,
-    AnalysisFlow.UNSOURCED_CLAIMS: None
+    flow: None for flow in AnalysisFlow  # Auto-register all enum members
 }
 
 def register_flow(flow: AnalysisFlow):
@@ -140,8 +138,14 @@ def render_flow_buttons():
                 }
 
 def process_active_flow():
-    if st.session_state.active_flow and FLOW_REGISTRY[st.session_state.active_flow]:
+    if st.session_state.active_flow:
         flow = st.session_state.active_flow
+        handler = FLOW_REGISTRY.get(flow)
+        
+        if not handler:
+            StreamlitLogger.log(f"No handler registered for {flow.value}")
+            return
+
         status = st.session_state.flow_status.get(flow, {})
         
         if status.get("running", False):
