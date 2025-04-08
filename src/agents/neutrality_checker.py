@@ -4,6 +4,7 @@ from src.config.settings import config
 from src.ui.logger import StreamlitLogger
 from src.ui.suggestion import Suggestion
 from src.utils.helpers import extract_context_from_words
+from src.utils.wikitext_patcher import WikitextPatcher
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -40,14 +41,14 @@ class NeutralityChecker:
         for term in self.cached_term_list:
             term: TermReplacement
 
-            def void_func():
-                return
-            
+            original_sentence: str = extract_context_from_words(text,term.non_neutral_term)
+            new_sentence = original_sentence.replace(term.non_neutral_term,term.alternative_term)
+
             new_suggestion = Suggestion(
                 type="Non-neutral language",
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
-                patch=void_func,
-                context=f"{extract_context_from_words(text,term.non_neutral_term)}",
+                patch=WikitextPatcher.create_text_replacement_patch(original_sentence,new_sentence),
+                context=f"{original_sentence}",
             )
             suggestion_list.append(new_suggestion)
 
