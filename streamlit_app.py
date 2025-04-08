@@ -112,7 +112,7 @@ def handle_unsourcedclaims_improvement(article_title: str, sources: list, urls: 
 # Sidebar for inputs
 with st.sidebar:
     st.header("Article Input")
-    article_title = st.text_input("Wikipedia Article Title", "Machine learning")
+    article_title = st.text_input("Wikipedia Article Title", "Cormorant-class gunvessel")
     sources = st.file_uploader("Upload Source Documents", 
                              type=["pdf", "txt", "md", "html"],
                              accept_multiple_files=True)
@@ -166,7 +166,7 @@ def process_active_flow():
                         "result": result
                     }
                     
-                    if flow == AnalysisFlow.SOURCE_IMPROVEMENT and result["status"] == "success":
+                    if result["status"] == "success":
                         st.session_state.suggestions = result["suggestions"]
                         st.session_state.original = result["original"]
                         st.session_state.original_source = result["original_source"]
