@@ -139,45 +139,55 @@ def render_flow_buttons():
 
 def process_active_flow():
     if st.session_state.active_flow:
-        flow = st.session_state.active_flow
-        handler = FLOW_REGISTRY.get(flow)
-        
-        if not handler:
-            StreamlitLogger.log(f"No handler registered for {flow.value}")
+        # Validate flow exists in registry
+        if st.session_state.active_flow not in FLOW_REGISTRY:
+            StreamlitLogger.log(f"Invalid flow: {st.session_state.active_flow}")
+            st.session_state.active_flow = None
             return
 
-        status = st.session_state.flow_status.get(flow, {})
+        flow = st.session_state.active_flow
+        handler = FLOW_REGISTRY[flow]
+        flow_status = st.session_state.flow_status.get(flow, {})
         
-        if status.get("running", False):
-            with st.status(f"Running {flow.value}...", expanded=True):
-                try:
-                    original_content = wiki.get_article_plain_text(article_title)
-                    original_wikitext_content = wiki.get_article_page_source(article_title)
+        # Only process if not completed
+        if not flow_status.get('completed'):
+            with st.status(f"Running {flow.value}...", expanded=True) as status:
+                if flow_status.get('running', False):
+                    try:
+                        original_content = wiki.get_article_plain_text(article_title)
+                        original_wikitext_content = wiki.get_article_page_source(article_title)
 
-                    result = FLOW_REGISTRY[flow](
-                        article_title,
-                        sources,
-                        [url.strip() for url in urls.split(",")] if urls else [],
-                        original_content,
-                        original_wikitext_content
-                    )
-                    st.session_state.flow_status[flow] = {
-                        "running": False,
-                        "result": result
-                    }
-                    
-                    if result["status"] == "success":
-                        st.session_state.suggestions = result["suggestions"]
-                        st.session_state.original = result["original"]
-                        st.session_state.original_source = result["original_source"]
+                        result = handler(
+                            article_title,
+                            sources,
+                            [url.strip() for url in urls.split(",")] if urls else [],
+                            original_content,
+                            original_wikitext_content
+                        )
+                        st.session_state.flow_status[flow] = {
+                            "running": False,
+                            "completed": True,
+                            "result": result
+                        }
                         
-                except Exception as e:
-                    StreamlitLogger.log(f"Error in {flow.value}: {str(e)}")
+                        if result["status"] == "success":
+                            st.session_state.suggestions = result["suggestions"]
+                            
+                    except Exception as e:
+                        StreamlitLogger.log(f"Error in {flow.value}: {str(e)}")
+                        st.session_state.flow_status[flow] = {
+                            "running": False,
+                            "completed": False,
+                            "result": {"status": "error"}
+                        }
+                    st.rerun()
+                else:
+                    # Initialize flow run
                     st.session_state.flow_status[flow] = {
-                        "running": False,
-                        "result": {"status": "error"}
+                        'running': True,
+                        'completed': False
                     }
-                st.rerun()
+                    st.rerun()
 
 # Main interface
 col1, col2 = st.columns([3, 2])
