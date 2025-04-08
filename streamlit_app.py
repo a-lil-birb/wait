@@ -204,10 +204,70 @@ with col1:
 if 'suggestions' not in st.session_state:
     st.session_state.suggestions = []
 
-# Function to apply accepted suggestions
-def apply_suggestions(original: str) -> str:
-    pass
-    return original
+# Add to session state initialization
+if 'history' not in st.session_state:
+    st.session_state.history = {
+        'wikitext': [],
+        'suggestions': []
+    }
+
+# Modified apply_suggestions function
+def apply_suggestions(wikitext: str) -> str:
+    """Apply accepted suggestions to wikitext"""
+    # Store previous state
+    st.session_state.history['wikitext'].append(wikitext)
+    st.session_state.history['suggestions'].append(
+        [s for s in st.session_state.suggestions]
+    )
+    
+    # Apply patches
+    modified = wikitext
+    for suggestion in st.session_state.suggestions:
+        if suggestion.status == 'accepted':
+            modified = suggestion.patch(modified)
+    return modified
+
+def revert_changes():
+    """Revert to previous state"""
+    if st.session_state.history['wikitext']:
+        st.session_state.current_wikitext = st.session_state.history['wikitext'].pop()
+        st.session_state.suggestions = st.session_state.history['suggestions'].pop()
+
+# In your final output section
+st.divider()
+st.header("Version Control")
+
+col1, col2 = st.columns([2, 1])
+with col1:
+    if st.button("Submit Approved Changes"):
+        try:
+            # Save current version before applying changes
+            previous = st.session_state.current_wikitext
+            new_content = apply_suggestions(previous)
+            st.session_state.current_wikitext = new_content
+            st.success("Changes submitted to history!")
+        except Exception as e:
+            st.error(f"Error applying changes: {str(e)}")
+
+with col2:
+    if st.session_state.history['wikitext']:
+        versions = [f"Version {i+1}" for i in range(len(st.session_state.history['wikitext']))]
+        selected_version = st.selectbox("History", options=versions, index=len(versions)-1)
+        
+        if st.button("Revert to Selected Version"):
+            idx = versions.index(selected_version)
+            st.session_state.current_wikitext = st.session_state.history['wikitext'][idx]
+            st.session_state.suggestions = st.session_state.history['suggestions'][idx]
+            # Truncate history to selected version
+            st.session_state.history['wikitext'] = st.session_state.history['wikitext'][:idx+1]
+            st.session_state.history['suggestions'] = st.session_state.history['suggestions'][:idx+1]
+            st.rerun()
+
+# Display current wikitext
+st.text_area("Wikipedia-formatted Content", 
+            value=st.session_state.current_wikitext,
+            height=400,
+            key="current_wikitext")
 
 # Suggestions rendering (same as before)
 if 'suggestions' in st.session_state and st.session_state.suggestions:
