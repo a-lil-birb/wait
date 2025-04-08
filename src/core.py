@@ -1,4 +1,4 @@
-from src.agents import ContentAnalyzer, ContentEditor, ResearcherAgent, NeutralityChecker
+from src.agents import ContentAnalyzer, ContentEditor, ResearcherAgent, NeutralityChecker, ResearcherAgentV2
 from src.utils.wikipedia import WikipediaClient
 from src.utils.file_parser import ContentParser
 from src.config.settings import config
@@ -21,6 +21,22 @@ def _research_text(article_title: str, parsed_source_list: list[str], source_sou
 
     return researcher_upload_list,researcher_upload_output_list
 
+def _research_text_v2(article_title: str, b64source_strs: list[str], source_source: str):
+    researcher_upload_list : list[ResearcherAgentV2] = []
+    researcher_upload_output_list :list[str] = []
+    
+    for idx, parsed_source in enumerate(b64source_strs, start=1):
+        new_researcher = ResearcherAgentV2(article_title, parsed_source)
+        StreamlitLogger.log(f"Researching {source_source} source {idx}...")
+        researcher_output = new_researcher.summarize_source()
+
+        researcher_upload_list.append(new_researcher)
+        researcher_upload_output_list.append(researcher_output)
+        StreamlitLogger.log(f"[ResearcherAgentV2#{idx}-{source_source}] Response:\n{researcher_output}")
+
+    return researcher_upload_list,researcher_upload_output_list
+
+
 def _analyze_research_and_article(article_title: str, article_content: str, summary: str):
     new_analyzer = ContentAnalyzer(article_title, article_content, summary)
     analysis = new_analyzer.find_missing_information()
@@ -37,12 +53,14 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
 
     parsed_source_files = []
     parsed_source_urls = []
+    b64_encoded_sources = []
     if len(source_files) > 0:
         StreamlitLogger.log(f"Parsing uploaded files ({len(source_files)})...")
-        parsed_source_files :list[str] = ContentParser.parse_uploaded_files(source_files)
+        #parsed_source_files :list[str] = ContentParser.parse_uploaded_files(source_files)
+        b64_encoded_sources :list[str] = ContentParser.encode_pdfs_into_b64(source_files)
     if len(source_urls) > 0:
         StreamlitLogger.log(f"Parsing URLs ({len(source_urls)})...")
-        parsed_source_urls :list[str] = ContentParser.parse_source_urls(source_urls)
+        #parsed_source_urls :list[str] = ContentParser.parse_source_urls(source_urls)
 
     # Research the provided sources
     researcher_upload_list : list[ResearcherAgent] = []
@@ -74,8 +92,20 @@ def enhance_article(article_title: str, source_files: list[io.BytesIO], source_u
         
         suggestion_list += edit_suggestions
     
-    neutral_analysis = neutrality.get_neutral_alternatives(original_content)
+    neutrality.get_neutral_alternatives(original_content)
     suggestion_list += neutrality.get_suggestions(original_content)
 
+
+    # ResearcherV2
+
+    return suggestion_list
+
+def check_neutrality(article_title: str, article_content: str, wikitext_content):
+    suggestion_list :list[Suggestion] = []
+
+    neutrality = NeutralityChecker()
+
+    neutrality.get_neutral_alternatives(article_content)
+    suggestion_list += neutrality.get_suggestions(article_content)
 
     return suggestion_list
