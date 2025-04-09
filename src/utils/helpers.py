@@ -21,15 +21,15 @@ def parse_to_mediawiki(message):
     for content in message.content:
         if content['type'] == 'text':
             text = content['text']
-            citations = content.get('citations', [])
+            citations = content.citations
             
             if citations:
                 citation_refs = []
                 for citation in citations:
-                    doc_title = citation.get('document_title', 'Unknown Document')
-                    start_page = citation.get('start_page_number', '?')
-                    end_page = citation.get('end_page_number', start_page)
-                    cited_text = citation.get('cited_text', '')
+                    doc_title = citation.document_title
+                    start_page = citation.start_page_number
+                    end_page = citation.end_page_number
+                    cited_text = citation.cited_text
                     
                     # Format page numbers
                     if start_page == end_page:
@@ -58,7 +58,7 @@ def parse_to_streamlit(message):
     for content in message.content:
         if content['type'] == 'text':
             text = content['text']
-            citations = content.get('citations', [])
+            citations = content.citations
             
             if citations:
                 citation_indices = []
@@ -76,10 +76,10 @@ def parse_to_streamlit(message):
     # Format references
     references = []
     for idx, citation in enumerate(citations_list, 1):
-        doc_title = citation.get('document_title', 'Unknown Document')
-        start_page = citation.get('start_page_number', '?')
-        end_page = citation.get('end_page_number', start_page)
-        cited_text = citation.get('cited_text', '')
+        doc_title = citation.document_title
+        start_page = citation.start_page_number
+        end_page = citation.end_page_number
+        cited_text = citation.cited_text
         
         if start_page == end_page:
             pages = f"page {start_page}"
