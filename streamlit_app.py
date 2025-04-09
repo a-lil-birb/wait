@@ -339,8 +339,9 @@ with col2:
 
 # Display current wikitext
 st.text_area("Wikipedia-formatted Content",
-            height=400,
-            key="current_wikitext")
+             value=st.session_state.current_wikitext,
+             height=400,
+             key="current_wikitext")
 
 if __name__ == "__main__":
     st.session_state.processing = False
