@@ -361,7 +361,7 @@ with col1:
         st.session_state.current_wikitext = new_content
         st.success("Changes submitted to history!")
 
-with col1:
+with col2:
     if st.button("Save Current Changes"):
         
         # Save current version before applying changes
