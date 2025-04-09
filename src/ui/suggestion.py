@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import Enum
 from typing import Callable, List, Optional, Dict, Any
 from dataclasses import dataclass, field
@@ -12,6 +13,7 @@ class Suggestion:
         text (str): Human-readable description of the suggestion
         context (str): Context around the suggested material
         patch Callable[[str],str]: Function to patch the original text with the suggestion
+        callback Callable[[Suggestion, str],Suggestion]
         status (str): Current approval status; new suggestions should be 'pending'
         extra List[str]: Storing additional information, varies between agent tasks or empty list
         id (int): Unique identifier (auto-generated)
@@ -19,6 +21,7 @@ class Suggestion:
     type: str
     text: str
     patch: Callable[[str],str]
+    callback: Callable[[Suggestion, str],Suggestion]
     context: str = "Unknown"
     status: str = 'pending'
     extra: List[str] = []
