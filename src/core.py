@@ -109,3 +109,14 @@ def check_neutrality(article_title: str, article_content: str, wikitext_content)
     suggestion_list += neutrality.get_suggestions(article_content)
 
     return suggestion_list
+
+def enhance_with_source(article_title: str, article_content: str, wikitext_content, sources):
+    suggestion_list :list[Suggestion] = []
+
+    for i in len(sources):
+        researcherV2 = ResearcherAgentV2(article_title, sources[i], article_content)
+
+        researcherV2.summarize_source()
+        suggestion_list += researcherV2.get_diff_suggestions(article_content)
+
+    return suggestion_list

@@ -78,10 +78,10 @@ def handle_source_improvement(article_title: str, sources: list, urls: list, ori
         StreamlitLogger.log("Starting source analysis...")
         
         StreamlitLogger.log("Processing sources...")
-        source_url_data = [url.strip() for url in urls if url.strip()]
+        #source_url_data = [url.strip() for url in urls if url.strip()]
         
         StreamlitLogger.log("Generating suggestions...")
-        enhancement_suggestions = enhance_article(article_title, sources, source_url_data)
+        enhancement_suggestions = core.enhance_with_source(article_title, original_content, wikitext_content, sources)
         
         return {
             "status": "success",
