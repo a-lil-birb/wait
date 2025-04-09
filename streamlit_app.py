@@ -282,34 +282,31 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                     placeholder="Ask for clarification or alternatives..."
                 )
                 if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
-                    try:
-                        # Get user input and original suggestion
-                        user_input = st.session_state[f"refine_input_{suggestion_id}"]
-                        original_suggestion = st.session_state.suggestions[idx]
+
+                    # Get user input and original suggestion
+                    user_input = st.session_state[f"refine_input_{suggestion_id}"]
+                    original_suggestion = st.session_state.suggestions[idx]
+                    
+                    # Show loading state
+                    with st.spinner("Generating refinement..."):
+                        # Call LLM conversation function
+                        refined_suggestion = original_suggestion.callback(
+                            original_suggestion=original_suggestion,
+                            user_input=user_input
+                        )
                         
-                        # Show loading state
-                        with st.spinner("Generating refinement..."):
-                            # Call LLM conversation function
-                            refined_suggestion = original_suggestion.callback(
-                                original_suggestion=original_suggestion,
-                                user_input=user_input
-                            )
-                            
-                            # Preserve original ID and status
-                            refined_suggestion.id = original_suggestion.id
-                            refined_suggestion.status = original_suggestion.status
-                            
-                            # Update the suggestion in the list
-                            st.session_state.suggestions[idx] = refined_suggestion
-                            
-                            # Close refinement interface
-                            st.session_state[refine_key] = False
-                            st.rerun()
-                            
-                    except Exception as e:
-                        st.error(f"Refinement failed: {str(e)}")
+                        # Preserve original ID and status
+                        refined_suggestion.id = original_suggestion.id
+                        refined_suggestion.status = original_suggestion.status
+                        
+                        # Update the suggestion in the list
+                        st.session_state.suggestions[idx] = refined_suggestion
+                        
+                        # Close refinement interface
                         st.session_state[refine_key] = False
                         st.rerun()
+                            
+                 
 
 # Modified apply_suggestions function
 def apply_suggestions(wikitext: str) -> str:
