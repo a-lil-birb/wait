@@ -155,16 +155,22 @@ def find_excerpt_position(plain_excerpt: str, wikitext: str) -> tuple:
     return (start_idx, end_idx) if start_idx is not None and end_idx is not None else None
 
 def _process_node(node):
-    """Extract relevant text from different node types"""
+    """Extract relevant text from different node types with proper string conversion"""
     if isinstance(node, mwparserfromhell.nodes.Text):
-        return node.value
+        return str(node.value)
+    
     if isinstance(node, mwparserfromhell.nodes.Wikilink):
-        return node.text or node.title
+        return str(node.text or node.title)
+    
     if isinstance(node, mwparserfromhell.nodes.Template):
-        return ' '.join([param.value for param in node.params])
+        # Convert params to strings before joining
+        return ' '.join([str(param.value) for param in node.params])
+    
     if isinstance(node, mwparserfromhell.nodes.Tag) and node.tag == 'ref':
         return ''
-    return ''
+    
+    # Handle other node types generically
+    return str(node)
 
 def _normalize_text(text: str) -> str:
     """Normalize text for comparison"""
