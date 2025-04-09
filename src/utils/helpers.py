@@ -1,5 +1,7 @@
 # helper functions commonly used
 import mwparserfromhell
+import html
+from mwparserfromhell.nodes import Tag, Template, Wikilink, Text
 import re
 from typing import Optional, Tuple, List, Dict
 
@@ -271,3 +273,54 @@ def fallback_find_excerpt(plain_excerpt, wikitext):
                         return best_start, best_end
     
     return None
+
+def process_node(node):
+    """Recursively process nodes with explicit tag handling"""
+    if isinstance(node, Text):
+        return html.unescape(node.value)
+    
+    if isinstance(node, Wikilink):
+        return node.title.strip_code().strip()
+    
+    if isinstance(node, Template):
+        return ""  # Remove templates
+    
+    if isinstance(node, Tag):
+        if node.tag == "table":
+            return process_table(node)
+        # Process other tags' contents (like <ref>, <br>) but remove the tags themselves
+        return "".join(process_node(n) for n in node.contents.nodes)
+    
+    # Fallback for other node types
+    try:
+        return html.unescape(node.strip_code().strip())
+    except AttributeError:
+        return str(node) if node else ""
+
+def process_table(table_node):
+    """Convert wikitable to plain text with proper formatting"""
+    table_text = []
+    
+    for row in table_node.contents.filter_tags(matches=lambda n: n.tag == "tr"):
+        cells = []
+        for cell in row.contents.filter_tags(matches=lambda n: n.tag in ["td", "th"]):
+            cell_content = "".join(process_node(n) for n in cell.contents.nodes)
+            cells.append(cell_content.strip())
+        
+        if cells:  # Skip empty rows
+            table_text.append(" | ".join(cells))
+    
+    return "\n".join(table_text)
+
+def wikitext_to_plaintext(wikitext):
+    parsed = mwparserfromhell.parse(wikitext)
+    processed = []
+    
+    for node in parsed.nodes:
+        processed.append(process_node(node))
+    
+    # Combine and clean up while preserving paragraphs
+    return "\n".join(
+        line.strip() for line in "".join(processed).splitlines() 
+        if line.strip()
+    )
