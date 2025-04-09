@@ -23,7 +23,7 @@ class NeutralityChecker:
 
     def continue_conversation(self, conversation_context, original_suggestion: Suggestion, user_input: str) -> Suggestion:
         # create a new context
-        new_conversation_context = list(self.conversation_context)
+        new_conversation_context = list(conversation_context)
         # refine prompt
         new_conversation_context.append(
             {
