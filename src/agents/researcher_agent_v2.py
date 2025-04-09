@@ -55,9 +55,9 @@ class ResearcherAgentV2:
             ]
         )
 
-
+        print(response, flush=True)
         self.mwparsed_response = parse_to_mediawiki(response)
-        #print(response)
+        
         return response
     
     def get_diff_suggestions(self) -> list[Suggestion]:
