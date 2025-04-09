@@ -42,6 +42,7 @@ class NeutralityChecker:
         )
 
         term: TermReplacement = response.choices[0].message.parsed
+        print(term, flush=True)
 
         new_suggestion = Suggestion(
                 type="Non-neutral language",
@@ -51,6 +52,7 @@ class NeutralityChecker:
                 context=f"<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
+        print(new_suggestion, flush=True)
 
         return new_suggestion
     
