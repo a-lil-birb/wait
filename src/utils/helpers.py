@@ -109,18 +109,31 @@ def find_excerpt_position(plain_excerpt: str, wikitext: str) -> tuple:
     current_pos = 0
     
     for node in parsed.nodes:
-        node_text = _process_node(node)
-        clean_text = _normalize_text(node_text)
-        
-        # Track original spans
-        start = node.span[0]
-        end = node.span[1]
-        segments.append({
-            'clean': clean_text,
-            'start': start,
-            'end': end,
-            'original': str(node)
-        })
+        try:
+            # Get node position using Wikicode's get_ancestors()
+            node_start = node.__span__[0] if hasattr(node, '__span__') else None
+            node_end = node.__span__[1] if hasattr(node, '__span__') else None
+            
+            if node_start is None or node_end is None:
+                # Fallback for nodes without span
+                parent = next(node.get_ancestors(), None)
+                if parent and hasattr(parent, '__span__'):
+                    node_start = parent.__span__[0]
+                    node_end = parent.__span__[1]
+                else:
+                    continue  # Skip nodes without position info
+
+            node_text = _process_node(node)
+            clean_text = _normalize_text(node_text)
+            
+            segments.append({
+                'clean': clean_text,
+                'start': node_start,
+                'end': node_end,
+                'original': str(node)
+            })
+        except Exception as e:
+            continue  # Skip problematic nodes
     
     # Build search string from cleaned segments
     clean_full = ''.join(seg['clean'] for seg in segments)
