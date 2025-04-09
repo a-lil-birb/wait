@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Callable, Optional, Dict, Any
+from typing import Callable, List, Optional, Dict, Any
 from dataclasses import dataclass, field
 
 @dataclass
@@ -13,6 +13,7 @@ class Suggestion:
         context (str): Context around the suggested material
         patch Callable[[str],str]: Function to patch the original text with the suggestion
         status (str): Current approval status; new suggestions should be 'pending'
+        extra List[str]: Storing additional information, varies between agent tasks or empty list
         id (int): Unique identifier (auto-generated)
     """
     type: str
@@ -20,6 +21,7 @@ class Suggestion:
     patch: Callable[[str],str]
     context: str = "Unknown"
     status: str = 'pending'
+    extra: List[str] = []
     id: int = field(init=False, default_factory=lambda: Suggestion._next_id())
     
     # Class-level ID counter
