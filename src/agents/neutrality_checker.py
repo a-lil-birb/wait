@@ -47,7 +47,7 @@ class NeutralityChecker:
             new_suggestion = Suggestion(
                 type="Non-neutral language",
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
-                patch=WikitextPatcher.create_text_replacement_patch(original_sentence,new_sentence),
+                patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 context=f"{original_sentence}",
             )
             suggestion_list.append(new_suggestion)
