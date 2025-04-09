@@ -211,6 +211,9 @@ if 'history' not in st.session_state:
         'suggestions': []
     }
 
+if 'current_wikitext' not in st.session_state:
+    st.session_state.current_wikitext = ""
+
 # Modified apply_suggestions function
 def apply_suggestions(wikitext: str) -> str:
     """Apply accepted suggestions to wikitext"""
