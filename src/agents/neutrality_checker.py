@@ -110,6 +110,7 @@ class NeutralityChecker:
         )
 
         self.conversation_context = messages_prompt.append(response.choices[0].message)
+        print(f"request conversation, {self.conversation_context}", flush=True)
         return response.choices[0].message.parsed
     
     def _guardrail_ensure_existing_terms(self, text :str, term_list_container :ListOfTerms) -> ListOfTerms:
