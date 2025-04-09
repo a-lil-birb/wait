@@ -301,7 +301,7 @@ def apply_suggestions(wikitext: str) -> str:
             modified = suggestion.patch(modified)
             print("patching")
     
-    print("patched")
+    print("patched",flush=True)
     return modified
 
 def revert_changes():
