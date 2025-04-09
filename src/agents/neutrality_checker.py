@@ -23,6 +23,7 @@ class NeutralityChecker:
 
     def continue_conversation(self, conversation_context, original_suggestion: Suggestion, user_input: str) -> Suggestion:
         # create a new context
+        print(f"continue conversation, {self.conversation_context}", flush=True)
         new_conversation_context = list(conversation_context)
         # refine prompt
         new_conversation_context.append(
@@ -72,6 +73,7 @@ class NeutralityChecker:
             return []
         
         suggestion_list = []
+        print(f"gen suggestions, {self.conversation_context}", flush=True)
         for term in self.cached_term_list:
             term: TermReplacement
 
@@ -83,7 +85,7 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
-                refine_context=self.conversation_context,
+                refine_context=list(self.conversation_context),
                 context=f"{original_sentence}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
