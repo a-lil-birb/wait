@@ -250,7 +250,7 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
             with col1:
                 st.markdown(f"""
                 {suggestion.text.replace("\n", " ")}
-                <em>Context: {suggestion.context.replace("\n", " ")}</em>
+                <em>{suggestion.context.replace("\n", " ")}</em>
                 """, unsafe_allow_html=True)
                 
             with col2:
