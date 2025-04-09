@@ -120,6 +120,6 @@ def enhance_with_source(article_title: str, article_content: str, wikitext_conte
         researcherV2 = ResearcherAgentV2(article_title, b64_file_list[i], article_content)
 
         researcherV2.summarize_source()
-        suggestion_list += researcherV2.get_diff_suggestions(article_content)
+        suggestion_list += researcherV2.get_diff_suggestions()
 
     return suggestion_list
