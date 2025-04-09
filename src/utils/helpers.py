@@ -13,12 +13,12 @@ def extract_context_from_words(full_text: str, words: str):
     
     return sentence_list
 
-def parse_to_mediawiki(json_data):
+def parse_to_mediawiki(message):
     """
     Converts Claude's JSON output to MediaWiki markup with citations
     """
     mediawiki_lines = []
-    for content in json_data.get('content', []):
+    for content in message.content:
         if content['type'] == 'text':
             text = content['text']
             citations = content.get('citations', [])
@@ -47,7 +47,7 @@ def parse_to_mediawiki(json_data):
     
     return ''.join(mediawiki_lines)
 
-def parse_to_streamlit(json_data):
+def parse_to_streamlit(message):
     """
     Converts Claude's JSON output to a Streamlit-friendly format with numbered citations
     Returns a tuple: (main_text, references)
@@ -55,7 +55,7 @@ def parse_to_streamlit(json_data):
     main_text_parts = []
     citations_list = []
     
-    for content in json_data.get('content', []):
+    for content in message.content:
         if content['type'] == 'text':
             text = content['text']
             citations = content.get('citations', [])
