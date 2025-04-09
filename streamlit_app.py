@@ -113,6 +113,17 @@ def handle_unsourcedclaims_improvement(article_title: str, sources: list, urls: 
 with st.sidebar:
     st.header("Article Input")
     article_title = st.text_input("Wikipedia Article Title", "Cormorant-class gunvessel")
+    if st.button("Load Article"):
+        og_src = wiki.get_article_page_source(article_title)
+        if 'history' not in st.session_state:
+            st.session_state.history = {
+                'wikitext': [og_src],
+                'suggestions': []
+            }
+
+        if 'current_wikitext' not in st.session_state:
+            st.session_state.current_wikitext = og_src
+        st.session_state
     sources = st.file_uploader("Upload Source Documents", 
                              type=["pdf", "txt", "md", "html"],
                              accept_multiple_files=True)
@@ -266,7 +277,7 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                     st.session_state[refine_key] = False
                     st.rerun()
 
-    # Display final output based on accepted suggestions
+# Display final output based on accepted suggestions
 # Add to session state initialization
 if 'history' not in st.session_state:
     st.session_state.history = {
