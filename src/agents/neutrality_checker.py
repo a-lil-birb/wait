@@ -46,7 +46,7 @@ class NeutralityChecker:
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
                 refine_context=new_conversation_context,
-                context=f"{original_suggestion.context}<br><br>Reasoning: {term.reasoning}",
+                context=f"{original_suggestion.context}<br><br>>User: {user_input}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
         print(new_suggestion, flush=True)
