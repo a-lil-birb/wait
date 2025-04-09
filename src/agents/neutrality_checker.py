@@ -21,10 +21,9 @@ class NeutralityChecker:
         self.cached_term_list = None
         self.conversation_context = []
 
-    def continue_conversation(self, conversation_context, original_suggestion: Suggestion, user_input: str) -> Suggestion:
+    def continue_conversation(self, original_suggestion: Suggestion, user_input: str) -> Suggestion:
         # create a new context
-        print(f"continue conversation, {self.conversation_context}", flush=True)
-        new_conversation_context = list(conversation_context)
+        new_conversation_context = list(self.conversation_context)
         # refine prompt
         new_conversation_context.append(
             {
@@ -46,8 +45,8 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
-                refine_context=conversation_context,
-                context=f"<br>Reasoning: {term.reasoning}",
+                refine_context=new_conversation_context,
+                context=f"{original_suggestion.context}<br><br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
         print(new_suggestion, flush=True)
@@ -86,7 +85,7 @@ class NeutralityChecker:
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
                 refine_context=list(self.conversation_context),
-                context=f"{original_sentence}<br>Reasoning: {term.reasoning}",
+                context=f"<br>{original_sentence}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
             suggestion_list.append(new_suggestion)
@@ -111,8 +110,6 @@ class NeutralityChecker:
 
         messages_prompt.append(response.choices[0].message)
         self.conversation_context = list(messages_prompt)
-        print(f"request conversation 1, {messages_prompt}", flush=True)
-        print(f"request conversation 2, {self.conversation_context}", flush=True)
         return response.choices[0].message.parsed
     
     def _guardrail_ensure_existing_terms(self, text :str, term_list_container :ListOfTerms) -> ListOfTerms:
