@@ -109,7 +109,8 @@ class NeutralityChecker:
             response_format=ListOfTerms,
         )
 
-        self.conversation_context = list(messages_prompt.append(response.choices[0].message))
+        messages_prompt.append(response.choices[0].message)
+        self.conversation_context = list(messages_prompt)
         print(f"request conversation 1, {messages_prompt}", flush=True)
         print(f"request conversation 2, {self.conversation_context}", flush=True)
         return response.choices[0].message.parsed
