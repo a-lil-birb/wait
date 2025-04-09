@@ -8,9 +8,9 @@ class WikitextPatcher:
         """Create patch for simple text replacements"""
         def patch(wikitext: str) -> str:
             pos = find_excerpt_position(original_excerpt, wikitext)
-            print(f"{pos}")
+            print(f"{pos}",flush=True)
             if not pos:
-                print("Was not patched.")
+                print("Was not patched.",flush=True)
                 return wikitext
             return wikitext[:pos[0]] + new_text + wikitext[pos[1]:]
         return patch
