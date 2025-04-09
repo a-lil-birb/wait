@@ -290,10 +290,12 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                     # Show loading state
                     with st.spinner("Generating refinement..."):
                         # Call LLM conversation function
+                        print(original_suggestion.callback)
                         refined_suggestion = original_suggestion.callback(
                             original_suggestion=original_suggestion,
                             user_input=user_input
                         )
+                        print(refined_suggestion)
                         
                         # Preserve original ID and status
                         refined_suggestion.id = original_suggestion.id
