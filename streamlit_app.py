@@ -343,5 +343,12 @@ st.text_area("Wikipedia-formatted Content",
              height=400,
              key="current_wikitext")
 
+if st.button("state_history"):
+    st.session_state.history
+if st.button("suggestions"):
+    st.session_state.suggestions
+if st.button("current_wikitext"):
+    st.session_state.current_wikitext
+
 if __name__ == "__main__":
     st.session_state.processing = False
