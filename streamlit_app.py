@@ -374,8 +374,13 @@ st.text_area("Wikipedia-formatted Content",
              height=400,
              key="current_wikitext_box")
 
-
-if st.button("Render"):
+if st.button("state_history"):
+    st.session_state.history
+if st.button("suggestions"):
+    st.session_state.suggestions
+if st.button("current_wikitext"):
+    st.session_state.current_wikitext
+if st.button("Render Wikitext"):
     # Convert Wikitext to HTML using Wikipedia API
     response = requests.post(
         'https://en.wikipedia.org/w/api.php',
@@ -408,12 +413,7 @@ if st.button("Render"):
         st.html(processed_html)
     else:
         st.error("Error converting Wikitext. Please try again.")
-if st.button("state_history"):
-    st.session_state.history
-if st.button("suggestions"):
-    st.session_state.suggestions
-if st.button("current_wikitext"):
-    st.session_state.current_wikitext
+
 
 if __name__ == "__main__":
     st.session_state.processing = False
