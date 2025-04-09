@@ -19,8 +19,8 @@ def parse_to_mediawiki(message):
     """
     mediawiki_lines = []
     for content in message.content:
-        if content['type'] == 'text':
-            text = content['text']
+        if content.type == 'text':
+            text = content.text
             citations = content.citations
             
             if citations:
@@ -56,8 +56,8 @@ def parse_to_streamlit(message):
     citations_list = []
     
     for content in message.content:
-        if content['type'] == 'text':
-            text = content['text']
+        if content.type == 'text':
+            text = content.text
             citations = content.citations
             
             if citations:
