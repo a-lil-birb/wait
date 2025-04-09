@@ -291,7 +291,7 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                     with st.spinner("Generating refinement..."):
                         # Call LLM conversation function
                         print(original_suggestion.callback)
-                        refined_suggestion = original_suggestion.callback(
+                        refined_suggestion = original_suggestion.callback.continue_conversation(
                             original_suggestion=original_suggestion,
                             user_input=user_input
                         )
