@@ -299,6 +299,7 @@ def apply_suggestions(wikitext: str) -> str:
     for suggestion in st.session_state.suggestions:
         if suggestion.status == 'accepted':
             modified = suggestion.patch(modified)
+            print("patching")
     
     print("patched")
     return modified
