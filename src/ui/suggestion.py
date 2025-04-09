@@ -21,7 +21,7 @@ class Suggestion:
     type: str
     text: str
     patch: Callable[[str],str]
-    callback: Callable[[Suggestion, str],Suggestion]
+    callback: object
     context: str = "Unknown"
     status: str = 'pending'
     extra: List[str] = field(default_factory=list)
