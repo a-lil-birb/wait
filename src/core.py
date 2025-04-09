@@ -113,8 +113,10 @@ def check_neutrality(article_title: str, article_content: str, wikitext_content)
 def enhance_with_source(article_title: str, article_content: str, wikitext_content, sources):
     suggestion_list :list[Suggestion] = []
 
-    for i in len(sources):
-        researcherV2 = ResearcherAgentV2(article_title, sources[i], article_content)
+    b64_file_list = ContentParser.encode_pdfs_into_b64(sources)
+
+    for i in len(b64_file_list):
+        researcherV2 = ResearcherAgentV2(article_title, b64_file_list[i], article_content)
 
         researcherV2.summarize_source()
         suggestion_list += researcherV2.get_diff_suggestions(article_content)
