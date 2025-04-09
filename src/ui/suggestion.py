@@ -24,7 +24,7 @@ class Suggestion:
     callback: Callable[[Suggestion, str],Suggestion]
     context: str = "Unknown"
     status: str = 'pending'
-    extra: List[str] = []
+    extra: List[str] = field(default_factory=list)
     id: int = field(init=False, default_factory=lambda: Suggestion._next_id())
     
     # Class-level ID counter
