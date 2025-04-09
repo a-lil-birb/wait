@@ -344,7 +344,7 @@ with col2:
 st.text_area("Wikipedia-formatted Content",
              value=st.session_state.current_wikitext,
              height=400,
-             key="current_wikitext")
+             key="current_wikitext_box")
 
 if st.button("state_history"):
     st.session_state.history
