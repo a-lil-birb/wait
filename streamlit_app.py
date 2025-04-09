@@ -317,14 +317,12 @@ st.header("Version Control")
 col1, col2 = st.columns([2, 1])
 with col1:
     if st.button("Submit Approved Changes"):
-        try:
-            # Save current version before applying changes
-            previous = st.session_state.current_wikitext
-            new_content = apply_suggestions(previous)
-            st.session_state.current_wikitext = new_content
-            st.success("Changes submitted to history!")
-        except Exception as e:
-            st.error(f"Error applying changes: {str(e)}")
+        
+        # Save current version before applying changes
+        previous = st.session_state.current_wikitext
+        new_content = apply_suggestions(previous)
+        st.session_state.current_wikitext = new_content
+        st.success("Changes submitted to history!")
 
 with col2:
     if st.session_state.history['wikitext']:
