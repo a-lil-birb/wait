@@ -114,8 +114,9 @@ def enhance_with_source(article_title: str, article_content: str, wikitext_conte
     suggestion_list :list[Suggestion] = []
 
     b64_file_list = ContentParser.encode_pdfs_into_b64(sources)
-
+    StreamlitLogger.log(b64_file_list)
     for i in len(b64_file_list):
+        StreamlitLogger.log(f"Parsing source ({i+1})")
         researcherV2 = ResearcherAgentV2(article_title, b64_file_list[i], article_content)
 
         researcherV2.summarize_source()
