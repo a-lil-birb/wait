@@ -115,15 +115,12 @@ with st.sidebar:
     article_title = st.text_input("Wikipedia Article Title", "Cormorant-class gunvessel")
     if st.button("Load Article"):
         og_src = wiki.get_article_page_source(article_title)
-        if 'history' not in st.session_state:
-            st.session_state.history = {
-                'wikitext': [og_src],
-                'suggestions': []
-            }
+        st.session_state.history = {
+            'wikitext': [og_src],
+            'suggestions': []
+        }
 
-        if 'current_wikitext' not in st.session_state:
-            st.session_state.current_wikitext = og_src
-        st.session_state
+        st.session_state.current_wikitext = og_src
     sources = st.file_uploader("Upload Source Documents", 
                              type=["pdf", "txt", "md", "html"],
                              accept_multiple_files=True)
