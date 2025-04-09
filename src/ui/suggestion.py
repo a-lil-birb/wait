@@ -22,6 +22,7 @@ class Suggestion:
     text: str
     patch: Callable[[str],str]
     callback: object
+    refine_context: List[object]
     context: str = "Unknown"
     status: str = 'pending'
     extra: List[str] = field(default_factory=list)

@@ -19,13 +19,9 @@ class ListOfTerms(BaseModel):
 class NeutralityChecker:
     def __init__(self):
         self.cached_term_list = None
-        self.conversation_context = None
+        self.conversation_context = []
 
-    def continue_conversation(self, original_suggestion: Suggestion, user_input: str) -> Suggestion:
-        if self.conversation_context is None:
-            StreamlitLogger.log("Attemped to continue non-existing conversation.")
-            return
-        
+    def continue_conversation(self, conversation_context, original_suggestion: Suggestion, user_input: str) -> Suggestion:
         # create a new context
         new_conversation_context = list(self.conversation_context)
         # refine prompt
@@ -49,6 +45,7 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
+                refine_context=conversation_context,
                 context=f"<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
@@ -86,6 +83,7 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
+                refine_context=self.conversation_context,
                 context=f"{original_sentence}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )

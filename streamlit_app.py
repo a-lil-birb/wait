@@ -293,6 +293,7 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                         print(original_suggestion.callback)
                         print(original_suggestion.callback.continue_conversation, flush=True)
                         refined_suggestion = original_suggestion.callback.continue_conversation(
+                            conversation_context=original_suggestion.refine_context,
                             original_suggestion=original_suggestion,
                             user_input=user_input
                         )
