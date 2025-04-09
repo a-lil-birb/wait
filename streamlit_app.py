@@ -338,8 +338,7 @@ with col2:
             st.rerun()
 
 # Display current wikitext
-st.text_area("Wikipedia-formatted Content", 
-            value=st.session_state.current_wikitext,
+st.text_area("Wikipedia-formatted Content",
             height=400,
             key="current_wikitext")
 
