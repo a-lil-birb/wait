@@ -47,6 +47,17 @@ if 'active_flow' not in st.session_state:
 if 'flow_status' not in st.session_state:
     st.session_state.flow_status = {}
 
+# Display final output based on accepted suggestions
+# Add to session state initialization
+if 'history' not in st.session_state:
+    st.session_state.history = {
+        'wikitext': [""],
+        'suggestions': [[]]
+    }
+
+if 'current_wikitext' not in st.session_state:
+    st.session_state.current_wikitext = ""
+
 # Flow registry and handlers
 FLOW_REGISTRY: Dict[AnalysisFlow, Callable] = {
     flow: None for flow in AnalysisFlow  # Auto-register all enum members
@@ -273,17 +284,6 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
                 if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
                     st.session_state[refine_key] = False
                     st.rerun()
-
-# Display final output based on accepted suggestions
-# Add to session state initialization
-if 'history' not in st.session_state:
-    st.session_state.history = {
-        'wikitext': [""],
-        'suggestions': [[]]
-    }
-
-if 'current_wikitext' not in st.session_state:
-    st.session_state.current_wikitext = ""
 
 # Modified apply_suggestions function
 def apply_suggestions(wikitext: str) -> str:
