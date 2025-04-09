@@ -41,7 +41,18 @@ class NeutralityChecker:
             response_format=TermReplacement,
         )
 
-        return response.choices[0].message.parsed
+        term: TermReplacement = response.choices[0].message.parsed
+
+        new_suggestion = Suggestion(
+                type="Non-neutral language",
+                text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
+                patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
+                callback=self,
+                context=f"<br>Reasoning: {term.reasoning}",
+                extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
+            )
+
+        return new_suggestion
     
     def get_neutral_alternatives(self, text: str) -> ListOfTerms:
         if not (self.cached_term_list is None):
@@ -73,7 +84,7 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
-                context=f"{original_sentence}\nReasoning:{term.reasoning}",
+                context=f"{original_sentence}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
             suggestion_list.append(new_suggestion)
