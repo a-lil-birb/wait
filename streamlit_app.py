@@ -368,11 +368,15 @@ with col2:
             st.session_state.history['suggestions'] = st.session_state.history['suggestions'][:idx+1]
             st.rerun()
 
+def update_wikitext():
+    st.session_state.current_wikitext = st.session_state.current_wikitext_box
+
 # Display current wikitext
 st.text_area("Wikipedia-formatted Content",
              value=st.session_state.current_wikitext,
              height=400,
-             key="current_wikitext_box")
+             key="current_wikitext_box",
+             on_change=update_wikitext)
 
 if st.button("state_history"):
     st.session_state.history
