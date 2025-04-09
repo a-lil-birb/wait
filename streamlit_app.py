@@ -8,6 +8,8 @@ from src.ui.suggestion import Suggestion
 import time
 from enum import Enum
 from typing import Dict, Callable
+from bs4 import BeautifulSoup
+import requests
 
 # Initialize logger with Streamlit callback
 def setup_logger():
@@ -174,6 +176,7 @@ def process_active_flow():
                 if flow_status.get('running', False):
                     try:
                         original_content = wiki.get_article_plain_text(article_title)
+                        # replace with current content
                         original_wikitext_content = wiki.get_article_page_source(article_title)
 
                         result = handler(
@@ -371,6 +374,40 @@ st.text_area("Wikipedia-formatted Content",
              height=400,
              key="current_wikitext_box")
 
+
+if st.button("Render"):
+    # Convert Wikitext to HTML using Wikipedia API
+    response = requests.post(
+        'https://en.wikipedia.org/w/api.php',
+        data={
+            'action': 'parse',
+            'format': 'json',
+            'text': st.session_state.current_wikitext,
+            'contentmodel': 'wikitext',
+        }
+    )
+
+    if response.status_code == 200:
+        result = response.json()
+        html = result['parse']['text']['*']
+        
+        # Convert relative links to absolute
+        soup = BeautifulSoup(html, 'html.parser')
+        for tag in soup.find_all(['a', 'img']):
+            if tag.get('href'):
+                if tag['href'].startswith('/'):
+                    tag['href'] = f'https://en.wikipedia.org{tag["href"]}'
+            if tag.get('src'):
+                if tag['src'].startswith('//'):
+                    tag['src'] = f'https:{tag["src"]}'
+                elif tag['src'].startswith('/'):
+                    tag['src'] = f'https://en.wikipedia.org{tag["src"]}'
+
+        processed_html = str(soup)
+        st.markdown("### Rendered Content:")
+        st.html(processed_html)
+    else:
+        st.error("Error converting Wikitext. Please try again.")
 if st.button("state_history"):
     st.session_state.history
 if st.button("suggestions"):
