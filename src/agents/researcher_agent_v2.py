@@ -63,7 +63,7 @@ class ResearcherAgentV2:
     def get_diff_suggestions(self) -> list[Suggestion]:
         THRESHOLD = 10  # Adjust this threshold as needed
 
-        matcher = difflib.SequenceMatcher(None, self.text, self.mwparsed_response)
+        matcher = difflib.SequenceMatcher(None, self.plaintext_article, self.mwparsed_response)
         opcodes = matcher.get_opcodes()
         # Merge nearby opcodes
         merged = []
