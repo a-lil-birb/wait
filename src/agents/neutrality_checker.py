@@ -41,7 +41,7 @@ class NeutralityChecker:
         for term in self.cached_term_list:
             term: TermReplacement
 
-            original_sentence: str = extract_context_from_words(text,term.non_neutral_term)
+            original_sentence: str = extract_context_from_words(text,term.non_neutral_term)[0]
             new_sentence = original_sentence.replace(term.non_neutral_term,term.alternative_term)
 
             new_suggestion = Suggestion(
