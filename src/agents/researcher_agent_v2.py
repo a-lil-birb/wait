@@ -48,7 +48,7 @@ class ResearcherAgentV2:
                         {
                             "type": "text",
                             #"text":f"In bullet point form, extract information of encyclopedic value including but not limited to metrics and dates, that is related to the topic of '{self.topic}' in the text that will follow. It must relate to '{self.topic}' in some form."
-                            "text": "Using the document provided as a source, improve the current article with information of encyclopedic value. This is including but not limited to metrics and dates, that is related to the topic of '{self.topic}' Write NEW sentences inside the article. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. The following is the current article to edit:\n{self.text}"
+                            "text": f"Using the document provided as a source, improve the current article with information of encyclopedic value. This is including but not limited to metrics and dates, that is related to the topic of '{self.topic}' Write NEW sentences inside the article. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. The following is the current article to edit:\n{self.plaintext_article}"
                         }
                     ]
                 }
