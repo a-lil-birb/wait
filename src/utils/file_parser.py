@@ -60,6 +60,7 @@ class ContentParser:
                 logger.error(f"Failed to process {uploaded_file.name}: {str(e)}")
         return results
     
+    @classmethod
     def encode_pdfs_into_b64(cls, uploaded_files) -> List[str]:
         """Process Streamlit UploadedFile (preferably pdf) into a b64 string"""
         results = []
