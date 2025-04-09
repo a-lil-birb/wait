@@ -204,6 +204,69 @@ with col1:
 if 'suggestions' not in st.session_state:
     st.session_state.suggestions = []
 
+# Suggestions rendering (same as before)
+if 'suggestions' in st.session_state and st.session_state.suggestions:
+    st.header("Improvement Suggestions")
+    
+    for idx, suggestion in enumerate(st.session_state.suggestions):
+        suggestion_id = suggestion.id
+        expander_key = f"expander_{suggestion_id}"
+        refine_key = f"refine_{suggestion_id}"
+        
+        if f"refine_{suggestion_id}" not in st.session_state:
+            st.session_state[f"refine_{suggestion_id}"] = False
+
+        with st.expander(f"Suggestion #{idx+1}: {suggestion.type}", expanded=True):
+            col1, col2 = st.columns([4, 2])
+            
+            with col1:
+                st.markdown(f"""
+                {suggestion.text.replace("\n", " ")}
+                <em>Context: {suggestion.context.replace("\n", " ")}</em>
+                """, unsafe_allow_html=True)
+                
+            with col2:
+                status_container = st.empty()
+                
+                # Current status display
+                if suggestion.status == 'accepted':
+                    status_container.success("✅ Accepted")
+                elif suggestion.status == 'rejected':
+                    status_container.error("❌ Rejected")
+                else:
+                    status_container.info("🔄 Pending")
+
+                # Button group
+                btn_col1, btn_col2, btn_col3 = st.columns([1,1,1])
+                
+                with btn_col1:
+                    if st.button("Accept", key=f"accept_{suggestion_id}"):
+                        st.session_state.suggestions[idx].status = 'accepted'
+                        st.rerun()
+                        
+                with btn_col2:
+                    if st.button("Reject", key=f"reject_{suggestion_id}"):
+                        st.session_state.suggestions[idx].status = 'rejected'
+                        st.rerun()
+                        
+                with btn_col3:
+                    if st.button("Refine", key=f"refine_btn_{suggestion_id}"):
+                        st.session_state[refine_key] = not st.session_state[refine_key]
+                        st.session_state.suggestions[idx].status = 'pending'
+                        st.rerun()
+
+            # Refine input area
+            if st.session_state[refine_key]:
+                refinement = st.text_area(
+                    "Enter refinement instructions:",
+                    key=f"refine_input_{suggestion_id}",
+                    placeholder="Ask for clarification or alternatives..."
+                )
+                if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
+                    st.session_state[refine_key] = False
+                    st.rerun()
+
+    # Display final output based on accepted suggestions
 # Add to session state initialization
 if 'history' not in st.session_state:
     st.session_state.history = {
@@ -271,86 +334,6 @@ st.text_area("Wikipedia-formatted Content",
             value=st.session_state.current_wikitext,
             height=400,
             key="current_wikitext")
-
-# Suggestions rendering (same as before)
-if 'suggestions' in st.session_state and st.session_state.suggestions:
-    st.header("Improvement Suggestions")
-    
-    for idx, suggestion in enumerate(st.session_state.suggestions):
-        suggestion_id = suggestion.id
-        expander_key = f"expander_{suggestion_id}"
-        refine_key = f"refine_{suggestion_id}"
-        
-        if f"refine_{suggestion_id}" not in st.session_state:
-            st.session_state[f"refine_{suggestion_id}"] = False
-
-        with st.expander(f"Suggestion #{idx+1}: {suggestion.type}", expanded=True):
-            col1, col2 = st.columns([4, 2])
-            
-            with col1:
-                st.markdown(f"""
-                {suggestion.text.replace("\n", " ")}
-                <em>Context: {suggestion.context.replace("\n", " ")}</em>
-                """, unsafe_allow_html=True)
-                
-            with col2:
-                status_container = st.empty()
-                
-                # Current status display
-                if suggestion.status == 'accepted':
-                    status_container.success("✅ Accepted")
-                elif suggestion.status == 'rejected':
-                    status_container.error("❌ Rejected")
-                else:
-                    status_container.info("🔄 Pending")
-
-                # Button group
-                btn_col1, btn_col2, btn_col3 = st.columns([1,1,1])
-                
-                with btn_col1:
-                    if st.button("Accept", key=f"accept_{suggestion_id}"):
-                        st.session_state.suggestions[idx].status = 'accepted'
-                        st.rerun()
-                        
-                with btn_col2:
-                    if st.button("Reject", key=f"reject_{suggestion_id}"):
-                        st.session_state.suggestions[idx].status = 'rejected'
-                        st.rerun()
-                        
-                with btn_col3:
-                    if st.button("Refine", key=f"refine_btn_{suggestion_id}"):
-                        st.session_state[refine_key] = not st.session_state[refine_key]
-                        st.session_state.suggestions[idx].status = 'pending'
-                        st.rerun()
-
-            # Refine input area
-            if st.session_state[refine_key]:
-                refinement = st.text_area(
-                    "Enter refinement instructions:",
-                    key=f"refine_input_{suggestion_id}",
-                    placeholder="Ask for clarification or alternatives..."
-                )
-                if st.button("Submit Refinement", key=f"refine_submit_{suggestion_id}"):
-                    st.session_state[refine_key] = False
-                    st.rerun()
-
-    # Display final output based on accepted suggestions
-    st.divider()
-    st.header("Final Output")
-    
-    if 'original_source' in st.session_state:
-        # Diff view
-        st.subheader("Change Preview")
-        tab1, tab2, tab3 = st.tabs(["Original", "Enhanced", "Diff"])
-
-        final_output = apply_suggestions(st.session_state.original_source)
-        edited = st.text_area("Wikipedia-formatted Content", 
-                            value=final_output,
-                            height=400)
-        
-        if st.button("Submit Approved Changes"):
-            # submission logic here
-            st.success("Submitted successfully!")
 
 if __name__ == "__main__":
     st.session_state.processing = False
