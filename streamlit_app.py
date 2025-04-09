@@ -117,7 +117,7 @@ with st.sidebar:
         og_src = wiki.get_article_page_source(article_title)
         st.session_state.history = {
             'wikitext': [og_src],
-            'suggestions': []
+            'suggestions': [[]]
         }
 
         st.session_state.current_wikitext = og_src
@@ -278,9 +278,12 @@ if 'suggestions' in st.session_state and st.session_state.suggestions:
 # Add to session state initialization
 if 'history' not in st.session_state:
     st.session_state.history = {
-        'wikitext': [],
-        'suggestions': []
+        'wikitext': [""],
+        'suggestions': [[]]
     }
+
+if 'current_wikitext' not in st.session_state:
+    st.session_state.current_wikitext = ""
 
 # Modified apply_suggestions function
 def apply_suggestions(wikitext: str) -> str:
