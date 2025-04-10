@@ -79,9 +79,12 @@ def handle_source_improvement(article_title: str, sources: list, urls: list, ori
         
         StreamlitLogger.log("Processing sources...")
         #source_url_data = [url.strip() for url in urls if url.strip()]
+        source_summaries = core.summarize_sources(article_title, original_content, wikitext_content, sources)
+
+        st.session_state.summaries = source_summaries
         
         StreamlitLogger.log("Generating suggestions...")
-        enhancement_suggestions = core.enhance_with_source(article_title, original_content, wikitext_content, sources)
+        enhancement_suggestions = core.enhance_with_source_summaries(article_title, original_content, wikitext_content, source_summaries)
         
         return {
             "status": "success",
@@ -225,6 +228,24 @@ with col1:
     render_flow_buttons()
     process_active_flow()
     show_processing_log()
+
+# Initialize session state for summaries
+if 'summaries' not in st.session_state:
+    st.session_state.summaries = []
+
+if 'summaries' in st.session_state and st.session_state.summaries:
+    st.header("Document Summaries")
+
+    for idx, summary in enumerate(st.session_state.summaries):
+
+        with st.expander(f"Dcoument #{idx+1}", expanded=True):
+            col1, col2 = st.columns([2, 2])
+
+            with col1:
+                st.markdown(summary[0])
+            with col2:
+                st.markdown('\n'.join(summary[1]))
+
 
 ## suggestions
 
@@ -393,12 +414,12 @@ st.text_area("Wikipedia-formatted Content",
              key="current_wikitext_box",
              on_change=update_wikitext)
 
-if st.button("state_history"):
-    st.session_state.history
-if st.button("suggestions"):
-    st.session_state.suggestions
-if st.button("current_wikitext"):
-    st.session_state.current_wikitext
+#if st.button("state_history"):
+#    st.session_state.history
+#if st.button("suggestions"):
+#    st.session_state.suggestions
+#if st.button("current_wikitext"):
+#    st.session_state.current_wikitext
 if st.button("Render Wikitext"):
     # Convert Wikitext to HTML using Wikipedia API
     response = requests.post(
