@@ -45,6 +45,32 @@ class ContentEditor:
         self.response: str = None
 
         self.conversation_context = []
+
+    def continue_conversation(self, original_suggestion: Suggestion, user_input: str) -> Suggestion:
+        # create a new context
+        new_conversation_context = list(self.conversation_context)
+        # refine prompt
+        new_conversation_context.append(
+            {
+                "role": "user",
+                "content": f"The user wants clarification on the suggestion to \"{original_suggestion.text}\" in your edited article. The following is their comment: \"{user_input}\". Provide a short reasoning that responds directly to the user."
+            }
+        )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini-2024-07-18",
+            messages=new_conversation_context
+        )
+
+        new_suggestion = Suggestion(
+                type=original_suggestion.type,
+                text=original_suggestion.text,
+                patch=original_suggestion.patch,
+                callback=original_suggestion.callback,
+                context=f"{original_suggestion.context}<br><br>>User: {user_input}<br>Reasoning: {response.choices[0].message.content}"
+            )
+        print(new_suggestion, flush=True)
+
+        return new_suggestion
     
     def improve_article_with_missing_info(self) -> str:
         """Use GPT-4o to improve content based on analysis."""
