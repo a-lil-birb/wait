@@ -35,6 +35,7 @@ class AnalysisFlow(Enum):
     SOURCE_IMPROVEMENT = "Analyze Sources and Improve"
     LANGUAGE_NEUTRALITY = "Check Language Neutrality"
     UNSOURCED_CLAIMS = "Identify Unsourced Claims"
+    IMPROVE_LINKING = "Improve Linking"
 
 # Initialize Wikipedia Client
 wiki = WikipediaClient()
@@ -112,6 +113,22 @@ def handle_neutrality_improvement(article_title: str, sources: list, urls: list,
     
 @register_flow(AnalysisFlow.UNSOURCED_CLAIMS)
 def handle_unsourcedclaims_improvement(article_title: str, sources: list, urls: list, original_content: str, wikitext_content: str):
+    try:
+        StreamlitLogger.log("Starting unsourced claims analysis...")
+        
+        StreamlitLogger.log("Generating suggestions...")
+        enhancement_suggestions = core.check_neutrality(article_title, original_content, wikitext_content)
+        
+        return {
+            "status": "success",
+            "suggestions": enhancement_suggestions
+        }
+    except Exception as e:
+        StreamlitLogger.log(f"Error: {str(e)}")
+        return {"status": "error"}
+    
+@register_flow(AnalysisFlow.IMPROVE_LINKING)
+def handle_linking_improvement(article_title: str, sources: list, urls: list, original_content: str, wikitext_content: str):
     try:
         StreamlitLogger.log("Starting unsourced claims analysis...")
         
