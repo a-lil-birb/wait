@@ -324,3 +324,41 @@ def wikitext_to_plaintext(wikitext):
         line.strip() for line in "".join(processed).splitlines() 
         if line.strip()
     )
+
+def process_node_skip_special(node):
+    """Process nodes while skipping tables and references entirely"""
+    if isinstance(node, Text):
+        return html.unescape(node.value)
+    
+    if isinstance(node, Wikilink):
+        return node.title.strip_code().strip()
+    
+    if isinstance(node, Template):
+        return ""  # Remove templates
+    
+    if isinstance(node, Tag):
+        # Skip tables and references completely
+        if node.tag in ["table", "ref"]:
+            return ""
+        # Process other tags' contents
+        return "".join(process_node_skip_special(n) for n in node.contents.nodes)
+    
+    # Fallback for other node types
+    try:
+        return html.unescape(node.strip_code().strip())
+    except AttributeError:
+        return str(node) if node else ""
+
+def wikitext_to_plaintext_skip_tables_refs(wikitext):
+    parsed = mwparserfromhell.parse(wikitext)
+    processed = []
+    
+    for node in parsed.nodes:
+        processed.append(process_node_skip_special(node))
+    
+    # Combine results while preserving paragraph breaks
+    return "\n\n".join(
+        "\n".join(line.strip() for line in part.splitlines() if line.strip())
+        for part in "".join(processed).split("\n\n")
+        if part.strip()
+    )
