@@ -74,25 +74,25 @@ def register_flow(flow: AnalysisFlow):
 
 @register_flow(AnalysisFlow.SOURCE_IMPROVEMENT)
 def handle_source_improvement(article_title: str, sources: list, urls: list, original_content: str, wikitext_content: str):
-    try:
-        StreamlitLogger.log("Starting source analysis...")
-        
-        StreamlitLogger.log("Processing sources...")
-        #source_url_data = [url.strip() for url in urls if url.strip()]
-        source_summaries = core.summarize_sources(article_title, original_content, wikitext_content, sources)
+    #try:
+    StreamlitLogger.log("Starting source analysis...")
+    
+    StreamlitLogger.log("Processing sources...")
+    #source_url_data = [url.strip() for url in urls if url.strip()]
+    source_summaries = core.summarize_sources(article_title, original_content, wikitext_content, sources)
 
-        st.session_state.summaries = source_summaries
-        
-        StreamlitLogger.log("Generating suggestions...")
-        enhancement_suggestions = core.enhance_with_source_summaries(article_title, original_content, wikitext_content, source_summaries)
-        
-        return {
-            "status": "success",
-            "suggestions": enhancement_suggestions
-        }
-    except Exception as e:
-        StreamlitLogger.log(f"Error: {str(e)}")
-        return {"status": "error"}
+    st.session_state.summaries = source_summaries
+    
+    StreamlitLogger.log("Generating suggestions...")
+    enhancement_suggestions = core.enhance_with_source_summaries(article_title, original_content, wikitext_content, source_summaries)
+    
+    return {
+        "status": "success",
+        "suggestions": enhancement_suggestions
+    }
+    #except Exception as e:
+    #    StreamlitLogger.log(f"Error: {str(e)}")
+    #    return {"status": "error"}
     
 @register_flow(AnalysisFlow.LANGUAGE_NEUTRALITY)
 def handle_neutrality_improvement(article_title: str, sources: list, urls: list, original_content: str, wikitext_content: str):
