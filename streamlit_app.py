@@ -1,6 +1,5 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from src.core import enhance_article
 from src import core
 from src.utils.wikipedia import WikipediaClient
 from src.ui.logger import StreamlitLogger
