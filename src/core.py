@@ -110,16 +110,31 @@ def check_neutrality(article_title: str, article_content: str, wikitext_content)
 
     return suggestion_list
 
-def enhance_with_source(article_title: str, article_content: str, wikitext_content, sources):
-    suggestion_list :list[Suggestion] = []
-
+def summarize_sources(article_title: str, article_content: str, wikitext_content, sources):
     b64_file_list = ContentParser.encode_pdfs_into_b64(sources)
+
+    summaries = []
 
     for i in range(len(b64_file_list)):
         StreamlitLogger.log(f"Parsing source ({i+1})")
         researcherV2 = ResearcherAgentV2(article_title, b64_file_list[i], article_content)
 
         researcherV2.summarize_source()
-        suggestion_list += researcherV2.get_diff_suggestions()
+        summaries.append(researcherV2.stparsed_response)
+
+    return summaries 
+
+def enhance_with_source_summaries(article_title: str, article_content: str, wikitext_content, summaries):
+    suggestion_list :list[Suggestion] = []
+
+    for idx, summary in enumerate(summaries, start=1):
+        parsed_summary = f"{summary[0]}\n\n{'\n'.join(summary[1])}"
+
+        analysis = _analyze_research_and_article(article_title, article_content, parsed_summary)
+        StreamlitLogger.log(f"[Analyzer#{idx}] Response:\n{analysis}")
+        edit_suggestions = _edit_article(article_title, article_content, analysis, idx)
+        StreamlitLogger.log(f"[ContentEditor#{idx}] Edit Diff List:\n{edit_suggestions}")
+        
+        suggestion_list += edit_suggestions
 
     return suggestion_list
