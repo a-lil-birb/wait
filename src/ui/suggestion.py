@@ -13,7 +13,7 @@ class Suggestion:
         text (str): Human-readable description of the suggestion
         context (str): Context around the suggested material
         patch Callable[[str],str]: Function to patch the original text with the suggestion
-        callback Callable[[Suggestion, str],Suggestion]
+        callback object: object of the agent so we can callback for refinements
         status (str): Current approval status; new suggestions should be 'pending'
         extra List[str]: Storing additional information, varies between agent tasks or empty list
         id (int): Unique identifier (auto-generated)
