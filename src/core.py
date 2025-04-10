@@ -112,7 +112,7 @@ def check_neutrality(article_title: str, article_content: str, wikitext_content)
 
 def summarize_sources(article_title: str, article_content: str, wikitext_content, sources):
     b64_file_list = ContentParser.encode_pdfs_into_b64(sources)
-
+    StreamlitLogger.log("Encoded sources")
     summaries = []
 
     for i in range(len(b64_file_list)):
