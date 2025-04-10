@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Dict, Callable
 from bs4 import BeautifulSoup
 import requests
-from src.utils.helpers import wikitext_to_plaintext
+from src.utils.helpers import wikitext_to_plaintext, wikitext_to_plaintext_skip_tables_refs
 
 # Initialize logger with Streamlit callback
 def setup_logger():
@@ -84,6 +84,8 @@ def handle_source_improvement(article_title: str, sources: list, urls: list, ori
 
     st.session_state.summaries = source_summaries
     
+    # use a special table-less version for this one
+    original_content = wikitext_to_plaintext_skip_tables_refs(wikitext_content)
     StreamlitLogger.log("Generating suggestions...")
     enhancement_suggestions = core.enhance_with_source_summaries(article_title, original_content, wikitext_content, source_summaries)
     
