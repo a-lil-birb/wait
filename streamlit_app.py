@@ -257,12 +257,12 @@ if 'summaries' in st.session_state and st.session_state.summaries:
     for idx, summary in enumerate(st.session_state.summaries):
 
         with st.expander(f"Document #{idx+1}", expanded=True):
-            col1, col2 = st.columns([3, 1])
+            col1, col2 = st.columns([2, 2])
 
             with col1:
                 st.markdown(summary[0])
             with col2:
-                st.markdown('<br><br>'.join(summary[1]))
+                st.markdown('<br><br>'.join(summary[1]), unsafe_allow_html=True)
 
 
 ## suggestions
