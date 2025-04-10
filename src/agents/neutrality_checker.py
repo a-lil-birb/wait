@@ -45,7 +45,6 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
-                refine_context=new_conversation_context,
                 context=f"{original_suggestion.context}<br><br>>User: {user_input}<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )
@@ -84,7 +83,6 @@ class NeutralityChecker:
                 text=f"Replace <b>'{term.non_neutral_term}'</b> with <b>'{term.alternative_term}'</b>",
                 patch=WikitextPatcher.create_text_replacement_patch(term.non_neutral_term,term.alternative_term),
                 callback=self,
-                refine_context=list(self.conversation_context),
                 context=f"<br>Featured in this sentence: {original_sentence}.<br>Reasoning: {term.reasoning}",
                 extra=[term.non_neutral_term, term.alternative_term, term.reasoning]
             )

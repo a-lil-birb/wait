@@ -29,7 +29,7 @@ class ResearcherAgentV2:
     def summarize_source(self) -> str:
         response = client.messages.create(
             model="claude-3-5-haiku-20241022",
-            max_tokens=1024,
+            max_tokens=2048,
             system="You are a Wikipedia editor. Follow Wikipedia's neutral tone and style, and do not make up information that is not in the presented documents.",
             messages=[
                 {
@@ -48,7 +48,7 @@ class ResearcherAgentV2:
                         },
                         {
                             "type": "text",
-                            "text":f"In bullet point form, extract information of encyclopedic value including but not limited to metrics and dates, that is related to the topic of '{self.topic}' in the attached document. It must relate to '{self.topic}' in some form. Cite the document for your points, and answer will only the bullet points."
+                            "text":f"In bullet point form, extract information of encyclopedic value including but not limited to metrics and dates, that is related to the topic of '{self.topic}' in the attached document. List as much as you can. It must relate to '{self.topic}' in some form. Cite the document for your points, and answer will only the bullet points."
                         }
                     ]
                 }

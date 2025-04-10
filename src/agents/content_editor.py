@@ -7,9 +7,12 @@ from src.ui.logger import StreamlitLogger
 from src.ui.suggestion import Suggestion
 from src.utils.helpers import extract_context_from_words
 import difflib
+from src.utils.wikitext_patcher import WikitextPatcher
 
 # Surrounding context length
 LEN_CTX = 60
+
+SMALLER_LEN_CTX = 20
 
 client = OpenAI(api_key=config.openai.api_key)
 
@@ -30,6 +33,9 @@ class Edit(BaseModel):
 def generate_diff_context(text, i1, i2):
     return f"...{text[max(i1-LEN_CTX,0):i1]}<b>{text[i1:i2]}</b>{text[i2:min(i2+LEN_CTX,len(text))]}..."
 
+def generate_diff_context_clean(text, i1, i2):
+    return f"{text[max(i1-SMALLER_LEN_CTX,0):i1]}<b>{text[i1:i2]}</b>{text[i2:min(i2+SMALLER_LEN_CTX,len(text))]}"
+
 class ContentEditor:
     def __init__(self, topic: str, article_text, summary_missing, idx):
         self.topic: str = topic
@@ -37,17 +43,26 @@ class ContentEditor:
         self.summary = summary_missing
         self.index = idx
         self.response: str = None
+
+        self.conversation_context = []
     
     def improve_article_with_missing_info(self) -> str:
-        """Use GPT-4 to improve content based on analysis."""
-        response = client.chat.completions.create(
-            model="gpt-4o-mini-2024-07-18",
-            messages=[
+        """Use GPT-4o to improve content based on analysis."""
+
+        messages_prompt = [
                 {"role": "system", "content": "You are a Wikipedia editor. Follow Wikipedia's neutral tone and style. You focus on adding missing information rather than rewording existing information in the article."},
                 {"role": "user", "content": f"Given a summary of a different source and our current article, edit the current article to include all information contained in the summary, placing the information in the relevant place. Write NEW sentences inside the article. You may reword information from the summary, but avoid changing existing text in the article too much. Answer with ONLY the new article. Here is the summary:\n{self.summary}\n\n\nSUMMARY ENDS HERE. The following is the current article to edit:\n{self.text}"}
             ]
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini-2024-07-18",
+            messages=messages_prompt
         )
         self.response = response.choices[0].message.content
+        # Save the conversation context for refinement later
+        messages_prompt.append(response.choices[0].message)
+        self.conversation_context = list(messages_prompt)
+
         return response.choices[0].message.content
     
     def get_diff_suggestions(self) -> list[Suggestion]:
@@ -116,7 +131,8 @@ class ContentEditor:
                     new_suggestion = Suggestion(
                         type=f"Edit (ContentEditor, with source {self.index})",
                         text=f"Replace <b>'{matcher.a[i1:i2]}'</b> with <b>'{matcher.b[j1:j2]}'</b>",
-                        patch=void_func,
+                        patch=WikitextPatcher.create_text_replacement_patch(matcher.a[i1:i2],matcher.b[j1:j2]),
+                        callback=self,
                         context=generate_diff_context(matcher.a,i1,i2),
                     )
                     suggestion_list.append(new_suggestion)
@@ -128,7 +144,8 @@ class ContentEditor:
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
                     text=f"Delete <b>'{matcher.a[i1:i2]}'</b>",
-                    patch=void_func,
+                    patch=WikitextPatcher.create_text_replacement_patch(matcher.a[i1:i2],""),
+                    callback=self,
                     context=generate_diff_context(matcher.a,i1,i2),
                 )
                 suggestion_list.append(new_suggestion)
@@ -143,7 +160,11 @@ class ContentEditor:
                 new_suggestion = Suggestion(
                     type=f"Edit (ContentEditor, with source {self.index})",
                     text=f"Insert <b>'{matcher.a[i1:i2]}'</b>",
-                    patch=void_func,
+                    patch=WikitextPatcher.create_text_replacement_patch(
+                        generate_diff_context_clean(matcher.a,i1,i2),
+                        generate_diff_context_clean(matcher.b,j1,j2)
+                        ),
+                    callback=self,
                     context=generate_diff_context(matcher.b,j1,j2),
                 )
                 suggestion_list.append(new_suggestion)
