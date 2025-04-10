@@ -33,7 +33,7 @@ setup_logger()
 class AnalysisFlow(Enum):
     SOURCE_IMPROVEMENT = "Analyze Sources and Improve"
     LANGUAGE_NEUTRALITY = "Check Language Neutrality"
-    UNSOURCED_CLAIMS = "Identify Unsourced Claims"
+    UNSOURCED_CLAIMS = "Unsourced Claims"
     IMPROVE_LINKING = "Improve Linking"
 
 # Initialize Wikipedia Client
